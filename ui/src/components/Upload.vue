@@ -84,24 +84,26 @@ export default {
       this.uploadStatus = 'exception'
     },
     showProgress(event) {
-      this.uploadPercentage = Number(event.percent.toFixed(2))
+      this.uploadPercentage = Number(event.percent.toFixed(0))
 
       // 计算速度
-      var perLoad = event.loaded - this.lastLoaded
-      this.lastLoaded = event.loaded
       var now = new Date().getTime()
       var perTime = (now - this.lastLoadTime) / 1000  // 秒
-      this.lastLoadTime = now
-      var speed = perLoad / perTime
+      if(perTime > 1) {
+        var perLoad = event.loaded - this.lastLoaded
+        this.lastLoaded = event.loaded
+        this.lastLoadTime = now
+        var speed = perLoad / perTime
 
-      if(speed > 1024*1024*1024) { // GB
-        this.speed = (speed / (1024*1024*1024)).toFixed(1) + ' GB/s'
-      } else if(speed > 1024*1024) {
-        this.speed = (speed / (1024*1024)).toFixed(1) + ' MB/s'
-      } else if(speed > 1024) {
-        this.speed = (speed / 1024).toFixed(1) + ' KB/s'
-      } else {
-        this.speed = speed.toFixed(1) + ' B/s'
+        if(speed > 1024*1024*1024) { // GB
+          this.speed = (speed / (1024*1024*1024)).toFixed(1) + ' GB/s'
+        } else if(speed > 1024*1024) {
+          this.speed = (speed / (1024*1024)).toFixed(1) + ' MB/s'
+        } else if(speed > 1024) {
+          this.speed = (speed / 1024).toFixed(1) + ' KB/s'
+        } else {
+          this.speed = speed.toFixed(0) + ' B/s'
+        }
       }
     },
     handleRemove() {
