@@ -14,13 +14,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/files")
-public class Controller {
+public class ApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @PostMapping(value = "upload")
     String upload(@RequestPart("file") MultipartFile[] files) {
