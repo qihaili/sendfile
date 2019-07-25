@@ -19,11 +19,14 @@ public class ScheduledJob {
     void cleanShares() {
         logger.debug("检测过期的共享");
         File repo = new File(Util.REPO_ROOT);
-        for (File shareDir : repo.listFiles()) {
-            long duration = System.currentTimeMillis() - shareDir.lastModified();
-            if (duration > ttl) {
-                logger.debug("删除" + shareDir);
-                FileSystemUtils.deleteRecursively(shareDir);
+        File[] dirs = repo.listFiles();
+        if (dirs != null) {
+            for (File shareDir : repo.listFiles()) {
+                long duration = System.currentTimeMillis() - shareDir.lastModified();
+                if (duration > ttl) {
+                    logger.debug("删除" + shareDir);
+                    FileSystemUtils.deleteRecursively(shareDir);
+                }
             }
         }
     }
