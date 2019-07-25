@@ -15,11 +15,16 @@
           <div style="margin: 20px 5px">
             <span>提取码</span>
             <el-input :value="shareId"></el-input>
+            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝提取码，在首页中输入，并点击“提取文件”</span>
           </div>
           <div style="margin: 20px 5px">
             <span>提取地址：</span>
             <el-input :value="address"></el-input>
+            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝地址，粘贴到浏览器地址栏中，并打开页面</span>
           </div>
+        </div>
+        <div v-else style="margin: 50px 5px">
+          <span>等待上传成功，生成提取码。。。</span>
         </div>
       </div>
       <div v-else>
@@ -42,7 +47,10 @@
       <div slot="header">
         下载文件
       </div>
-      <el-input v-model="shareId" placeholder="提取码" style="margin-top: 70px"><el-button slot="append" @click="showFiles(shareId)">提取文件</el-button></el-input>
+      <div style="text-align: left; margin-top: 70px">
+        <span>输入提取码下载文件</span>
+        <el-input v-model="shareId" placeholder="提取码"><el-button slot="append" @click="showFiles(shareId)">提取文件</el-button></el-input>
+      </div>
     </el-card>
   </div>
 </template>
@@ -123,7 +131,7 @@ export default {
 <style>
 .mycard {
   width: 400px;
-  height: 450px;
+  height: 480px;
   margin: 10px;
   display: inline-block;
 }
