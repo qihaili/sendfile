@@ -5,8 +5,12 @@
         上传文件
       </div>
       <div v-if="isChooseUpload && !isChooseDownload">
+        <!-- <upload-progress :percentage="uploadPercentage" :speed="speed"/> -->
         <el-progress type="circle" :percentage="uploadPercentage" :status="uploadStatus"/>
-        <el-divider/>
+        <div style="height: 20px; line-height: 20px">
+          <span style="font-size: 14px">{{ speed }}</span>
+        </div>
+        <!-- <el-divider/> -->
         <div v-if="shareId != null" style="text-align: left;">
           <div style="margin: 20px 5px">
             <span>提取码</span>
@@ -45,7 +49,11 @@
 
 <script>
 // import { constants } from 'crypto';
+import UploadProgress from './UploadProgress'
 export default {
+  components: {
+    'upload-progress': UploadProgress
+  },
   data() {
     return {
       isSuccess: false,
@@ -53,7 +61,10 @@ export default {
       isChooseDownload: true,
       shareId: null,
       uploadPercentage: 0,
-      uploadStatus: null
+      uploadStatus: null,
+      speed: null,
+      lastLoaded: 0,
+      lastLoadTime: null
     }
   },
   computed: {
@@ -66,21 +77,40 @@ export default {
       this.$message.success('上传成功')
       this.isSuccess = true
       this.shareId = response
-      // this.address = 
       this.uploadStatus = 'success'
     },
     handleError() {
       this.$message.error('上传失败')
+      this.uploadStatus = 'exception'
     },
     showProgress(event) {
       this.uploadPercentage = Number(event.percent.toFixed(2))
+
+      // 计算速度
+      var perLoad = event.loaded - this.lastLoaded
+      this.lastLoaded = event.loaded
+      var now = new Date().getTime()
+      var perTime = (now - this.lastLoadTime) / 1000  // 秒
+      this.lastLoadTime = now
+      var speed = perLoad / perTime
+
+      if(speed > 1024*1024*1024) { // GB
+        this.speed = (speed / (1024*1024*1024)).toFixed(1) + ' GB/s'
+      } else if(speed > 1024*1024) {
+        this.speed = (speed / (1024*1024)).toFixed(1) + ' MB/s'
+      } else if(speed > 1024) {
+        this.speed = (speed / 1024).toFixed(1) + ' KB/s'
+      } else {
+        this.speed = speed.toFixed(1) + ' B/s'
+      }
     },
     handleRemove() {
       return false;
     },
     chooseUpload() {
-      this.isChooseUpload = true;
-      this.isChooseDownload = false;
+      this.isChooseUpload = true
+      this.isChooseDownload = false
+      this.lastLoadTime = new Date().getTime()
     },
     showFiles(shareId) {
       this.$router.push(`/${shareId}`)

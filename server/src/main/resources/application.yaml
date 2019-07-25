@@ -9,3 +9,8 @@ spring:
     multipart:
       maxFileSize: -1     # 不限制上传文件大小
       maxRequestSize: -1  # 不限制上传文件大小
+logging:
+#  file: log/sendfile.log
+  level:
+#    root: DEBUG
+    cn.pers.qhl.sendfile.*: DEBUG
