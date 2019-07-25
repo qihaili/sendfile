@@ -1,7 +1,10 @@
 <template>
   <el-card style="width: 400px; height: 400px; display: inline-block;" v-loading="loading">
-    <el-table v-if="response == null" :data="files" size="mini">
-      <el-table-column label="文件">
+    <div slot="header">
+      文件（点击文件名下载）
+    </div>
+    <el-table v-if="response == null" :data="files" size="mini" :show-header=false>
+      <el-table-column>
         <template slot-scope="file">
           <el-link :href="'/api/files/' + $route.params.shareId + '/' + file.row.name" style="margin-left: 10px">{{ file.row.name }}</el-link>
         </template>
