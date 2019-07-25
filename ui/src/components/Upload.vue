@@ -56,12 +56,11 @@
 </template>
 
 <script>
-// import { constants } from 'crypto';
-import UploadProgress from './UploadProgress'
+// import UploadProgress from './UploadProgress'
 export default {
-  components: {
-    'upload-progress': UploadProgress
-  },
+  // components: {
+  //   'upload-progress': UploadProgress
+  // },
   data() {
     return {
       isSuccess: false,
