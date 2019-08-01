@@ -1,8 +1,10 @@
 package cn.pers.qhl.sendfile;
 
+import cn.pers.qhl.sendfile.config.SendFileConfig;
 import com.google.common.base.Predicates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -16,6 +18,11 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+// TODO 增加配置：上传文件大小限制，默认1G
+// TODO 增加配置：上传文件过期时间，默认24小时
+// TODO 增加配置：轮询扫描过期文件的间隔时间，默认1小时
+// TODO 页面上需要显示这些配置信息，从服务端获取
 
 @SpringBootApplication
 @EnableSwagger2
@@ -32,6 +39,9 @@ public class Application implements ApplicationRunner {
     @Value("${swagger.show:true}")
     private boolean swaggerShow;
 
+    @Autowired
+    private SendFileConfig config;
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -44,6 +54,8 @@ public class Application implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-
+        logger.debug("过期时间：" + config.getShare().getTtl());
+        logger.debug("扫描间隔：" + config.getShare().getScanInterval());
+        logger.debug("最大文件：" + config.getShare().getMaxFileSize());
     }
 }

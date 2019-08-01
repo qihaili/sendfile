@@ -7,10 +7,15 @@ spring:
       charset: UTF-8
   servlet:
     multipart:
-      maxFileSize: -1     # 不限制上传文件大小
-      maxRequestSize: -1  # 不限制上传文件大小
+      max-file-size: -1     # 不限制上传文件大小
+      max-request-size: -1  # 不限制上传文件大小
 logging:
 #  file: log/sendfile.log
   level:
 #    root: DEBUG
     cn.pers.qhl.sendfile.*: DEBUG
+sendfile:
+  share:
+    ttl: 1  # 单位：天
+    scan-interval: 1  # 单位：小时
+    max-file-size: 100 # 单位：MB

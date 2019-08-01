@@ -12,6 +12,7 @@
         </div>
         <!-- <el-divider/> -->
         <div v-if="shareId != null" style="text-align: left;">
+          <span style="font-size: 14px">文件将在24小时后过期</span>
           <div style="margin: 20px 5px">
             <span>提取码</span>
             <el-input :value="shareId"></el-input>
@@ -31,15 +32,16 @@
         <el-upload
           drag
           action="/api/files/upload"
-          :show-file-list="true"
+          :show-file-list="false"
           :before-upload="chooseUpload"
           :before-remove="handleRemove"
           :on-success="handleSuccess"
           :on-error="handleError"
-          :on-progress="showProgress">
+          :on-progress="showProgress"
+          >
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">可上传任何文件，任何大小</div>
+          <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
         </el-upload>
       </div>
     </el-card>
@@ -56,6 +58,7 @@
 </template>
 
 <script>
+import axios from 'axios'
 // import UploadProgress from './UploadProgress'
 export default {
   // components: {
@@ -71,13 +74,30 @@ export default {
       uploadStatus: null,
       speed: null,
       lastLoaded: 0,
-      lastLoadTime: null
+      lastLoadTime: null,
+      fileList: [],
+      shareTTL: null,
+      maxFileSize: null
     }
   },
   computed: {
     address: function() {
       return window.location.href + this.shareId
     }
+  },
+  created() {
+    const _this = this
+    axios.get('/api/config')
+    .then(function(data) {
+      console.log(data.data)
+      _this.shareTTL = data.data.shareTTL
+      _this.maxFileSize = data.data.maxFileSize
+    }, function(err) {
+      console.log('bbb')
+    })
+    .catch(function(err) {
+      console.log('aaa')
+    })
   },
   methods: {
     handleSuccess(response) {
@@ -86,8 +106,11 @@ export default {
       this.shareId = response
       this.uploadStatus = 'success'
     },
-    handleError() {
-      this.$message.error('上传失败')
+    handleError(err) {
+      var response = JSON.parse(err.message)
+      console.log(response.message)
+
+      this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
     },
     showProgress(event) {
@@ -116,13 +139,24 @@ export default {
     handleRemove() {
       return false;
     },
-    chooseUpload() {
+    chooseUpload(file) {
+      console.log('最大文件大小：' + this.maxFileSize + 'MB')
+      console.log(file.size)
+      if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
+        this.$message.error('文件过大，不能超过' + this.maxFileSize + 'MB')
+        return false
+      }
       this.isChooseUpload = true
       this.isChooseDownload = false
       this.lastLoadTime = new Date().getTime()
     },
     showFiles(shareId) {
       this.$router.push(`/${shareId}`)
+    },
+    changeFileList(file, fileList) {
+      console.log(file, file.name)
+      console.log(fileList)
+      console.log(this.fileList)
     }
   }
 }
@@ -130,7 +164,7 @@ export default {
 <style>
 .mycard {
   width: 400px;
-  height: 480px;
+  height: 500px;
   margin: 10px;
   display: inline-block;
 }
