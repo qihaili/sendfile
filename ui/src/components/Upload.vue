@@ -12,7 +12,7 @@
         </div>
         <!-- <el-divider/> -->
         <div v-if="shareId != null" style="text-align: left;">
-          <span style="font-size: 14px">文件将在24小时后过期</span>
+          <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <div style="margin: 20px 5px">
             <span>提取码</span>
             <el-input :value="shareId"></el-input>
