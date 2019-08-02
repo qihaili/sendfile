@@ -5,10 +5,6 @@ spring:
     encoding:
       force: true
       charset: UTF-8
-  servlet:
-    multipart:
-      max-file-size: -1     # 不限制上传文件大小
-      max-request-size: -1  # 不限制上传文件大小
 logging:
 #  file: log/sendfile.log
   level:
@@ -18,4 +14,4 @@ sendfile:
   share:
     ttl: 1  # 单位：天
     scan-interval: 1  # 单位：小时
-    max-file-size: 100 # 单位：MB
+    max-file-size: -1 # 单位：MB

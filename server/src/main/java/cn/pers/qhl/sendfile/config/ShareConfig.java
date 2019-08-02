@@ -2,33 +2,33 @@ package cn.pers.qhl.sendfile.config;
 
 public class ShareConfig {
 
-    private Long ttl;
+    private Double ttl;
 
-    private Long scanInterval;
+    private Double scanInterval;
 
-    private Long maxFileSize;
+    private Double maxFileSize;
 
-    public Long getTtl() {
+    public Double getTtl() {
         return ttl;
     }
 
-    public void setTtl(Long ttl) {
+    public void setTtl(Double ttl) {
         this.ttl = ttl;
     }
 
-    public Long getScanInterval() {
+    public Double getScanInterval() {
         return scanInterval;
     }
 
-    public void setScanInterval(Long scanInterval) {
+    public void setScanInterval(Double scanInterval) {
         this.scanInterval = scanInterval;
     }
 
-    public Long getMaxFileSize() {
+    public Double getMaxFileSize() {
         return maxFileSize;
     }
 
-    public void setMaxFileSize(Long maxFileSize) {
+    public void setMaxFileSize(Double maxFileSize) {
         this.maxFileSize = maxFileSize;
     }
 }
