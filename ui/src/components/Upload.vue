@@ -13,15 +13,20 @@
         <!-- <el-divider/> -->
         <div v-if="shareId != null" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
-          <div style="margin: 20px 5px">
+          <!-- <div style="margin: 20px 5px">
             <span>提取码</span>
             <el-input :value="shareId"></el-input>
             <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝提取码，在首页中输入，并点击“提取文件”</span>
-          </div>
+          </div> -->
           <div style="margin: 20px 5px">
             <span>提取地址：</span>
-            <el-input :value="address"></el-input>
+            <el-input :value="address">
+              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制地址</el-button>
+            </el-input>
             <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝地址，粘贴到浏览器地址栏中，并打开页面</span>
+          </div>
+          <div style="text-align: center;">
+            <el-link type="primary" @click="backToHome">再次上传</el-link>
           </div>
         </div>
         <div v-else style="margin: 50px 5px">
@@ -45,7 +50,7 @@
         </el-upload>
       </div>
     </el-card>
-    <el-card class="mycard" v-if="isChooseDownload">
+    <!-- <el-card class="mycard" v-if="isChooseDownload">
       <div slot="header">
         下载文件
       </div>
@@ -53,7 +58,7 @@
         <span>输入提取码下载文件</span>
         <el-input v-model="shareId" placeholder="提取码"><el-button slot="append" @click="showFiles(shareId)">提取文件</el-button></el-input>
       </div>
-    </el-card>
+    </el-card> -->
   </div>
 </template>
 
@@ -105,6 +110,7 @@ export default {
       this.isSuccess = true
       this.shareId = response
       this.uploadStatus = 'success'
+      this.speed = null
     },
     handleError(err) {
       var response = JSON.parse(err.message)
@@ -157,6 +163,13 @@ export default {
       console.log(file, file.name)
       console.log(fileList)
       console.log(this.fileList)
+    },
+    onCopySuccess(e) {
+      this.$message.success('地址已复制')
+    },
+    backToHome() {
+      this.isChooseUpload = true
+      this.isChooseDownload = true
     }
   }
 }
@@ -164,7 +177,7 @@ export default {
 <style>
 .mycard {
   width: 400px;
-  height: 500px;
+  height: 450px;
   margin: 10px;
   display: inline-block;
 }
