@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Upload from './components/Upload'
-import Files from './components/Files'
+import Download from './components/Download'
 
 Vue.use(Router)
 
@@ -20,7 +20,7 @@ export default new Router({
     {
       path: '/:shareId',
       // redirect: '/upload', // 默认页面
-      component: Files
+      component: Download
     }
   ]
 })

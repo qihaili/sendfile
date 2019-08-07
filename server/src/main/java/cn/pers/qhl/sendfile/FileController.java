@@ -28,11 +28,13 @@ public class FileController {
     private SendFileConfig config;
 
     @PostMapping(value = "upload")
-    String upload(@RequestPart("file") MultipartFile[] files) {
+    Share upload(@RequestPart("file") MultipartFile[] files) {
 //        String shareId = UUID.randomUUID().toString();
         String shareId = Util.genId();
         File shareDir = new File(Util.REPO_ROOT, shareId);
         shareDir.mkdirs();
+
+        ArrayList<ShareFile> shareFiles = new ArrayList<>();
         for (MultipartFile file : files) {
             if (config.getShare().getMaxFileSize() > 0 && file.getSize() > config.getShare().getMaxFileSize().longValue() * 1024 * 1024) {
                 throw new BadRequestException("文件过大");
@@ -41,12 +43,24 @@ public class FileController {
 
             try {
                 file.transferTo(destFile.getCanonicalFile());
+
+                ShareFile shareFile = new ShareFile();
+                shareFile.setName(file.getOriginalFilename());
+                shareFile.setSize(file.getSize());
+                shareFiles.add(shareFile);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 throw new ServerException(e);
             }
         }
-        return shareId;
+
+        Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+
+        Share share = new Share();
+        share.setId(shareId);
+        share.setTtl(ttl);
+        share.setFiles(shareFiles);
+        return share;
     }
 
     @GetMapping("{shareId}/{filePath}")
@@ -65,17 +79,25 @@ public class FileController {
     }
 
     @GetMapping("{shareId}")
-    List<ShareFile> get(@PathVariable String shareId) {
+    Share get(@PathVariable String shareId) {
         File shareDir = Util.getShareDir(shareId);
 
         ArrayList<ShareFile> files = new ArrayList<>();
-        for (String fileName : shareDir.list()) {
-            ShareFile file = new ShareFile();
-            file.setName(fileName);
-            files.add(file);
+        for (File file : shareDir.listFiles()) {
+            ShareFile shareFile = new ShareFile();
+            shareFile.setName(file.getName());
+            shareFile.setSize(file.length());
+            files.add(shareFile);
         }
 
-        return files;
+        Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+
+        Share share = new Share();
+        share.setId(shareId);
+        share.setTtl(ttl);
+        share.setFiles(files);
+
+        return share;
     }
 
 }

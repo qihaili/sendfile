@@ -11,7 +11,7 @@
           <span style="font-size: 14px">{{ speed }}</span>
         </div>
         <!-- <el-divider/> -->
-        <div v-if="shareId != null" style="text-align: left;">
+        <div v-if="share != null" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <!-- <div style="margin: 20px 5px">
             <span>提取码</span>
@@ -50,6 +50,25 @@
         </el-upload>
       </div>
     </el-card>
+    <el-card class="mycard" v-if="uploadedList.length > 0">
+      <el-card v-for="(uploadedShare, index) in uploadedList" :key="index" style="margin: 10px">
+        <files :share="uploadedShare" :on-removed="shareRemoved"></files>
+      </el-card>
+      <!-- <el-card v-for="(uploadedFile, index) in uploadedList" :key="index" style="margin: 10px">
+        <el-table :data="uploadedFile.files" size="mini" :show-header=false>
+          <el-table-column>
+            <template slot-scope="file">
+              <i class="el-icon-document" style="font-size: 20px; vertical-align: middle;"></i><el-link :href="'/api/files/' + $route.params.shareId + '/' + file.row.name" style="margin-left: 10px; vertical-align: middle;">{{ file.row.name }}</el-link>
+            </template>
+          </el-table-column>
+          <el-table-column min-width="20px">
+            <template slot-scope="file">
+              <span style="vertical-align: middle;">{{ humanReadableDataSize(file.row.size) }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card> -->
+    </el-card>
     <!-- <el-card class="mycard" v-if="isChooseDownload">
       <div slot="header">
         下载文件
@@ -64,17 +83,17 @@
 
 <script>
 import axios from 'axios'
-// import UploadProgress from './UploadProgress'
+import files from './Files'
 export default {
-  // components: {
-  //   'upload-progress': UploadProgress
-  // },
+  components: {
+    files
+  },
   data() {
     return {
       isSuccess: false,
       isChooseUpload: true,
       isChooseDownload: true,
-      shareId: null,
+      share: null,
       uploadPercentage: 0,
       uploadStatus: null,
       speed: null,
@@ -82,19 +101,19 @@ export default {
       lastLoadTime: null,
       fileList: [],
       shareTTL: null,
-      maxFileSize: null
+      maxFileSize: null,
+      uploadedList: JSON.parse(localStorage.getItem('uploaded')) == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
     }
   },
   computed: {
     address: function() {
-      return window.location.href + this.shareId
+      return window.location.href + this.share.id
     }
   },
   created() {
     const _this = this
     axios.get('/api/config')
     .then(function(data) {
-      console.log(data.data)
       _this.shareTTL = data.data.shareTTL
       _this.maxFileSize = data.data.maxFileSize
     }, function(err) {
@@ -103,14 +122,17 @@ export default {
     .catch(function(err) {
       console.log('aaa')
     })
+    // setInterval(this.syncUploadedShareList, 3000);
   },
   methods: {
     handleSuccess(response) {
       this.$message.success('上传成功')
       this.isSuccess = true
-      this.shareId = response
+      this.share = response
       this.uploadStatus = 'success'
       this.speed = null
+      this.uploadedList.push(this.share)
+      localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(err) {
       var response = JSON.parse(err.message)
@@ -156,8 +178,8 @@ export default {
       this.isChooseDownload = false
       this.lastLoadTime = new Date().getTime()
     },
-    showFiles(shareId) {
-      this.$router.push(`/${shareId}`)
+    showFiles(share) {
+      this.$router.push(`/${share}`)
     },
     changeFileList(file, fileList) {
       console.log(file, file.name)
@@ -170,13 +192,40 @@ export default {
     backToHome() {
       this.isChooseUpload = true
       this.isChooseDownload = true
+    },
+    async syncUploadedShareList() {
+      var _this = this
+      for (var index in this.uploadedList) {
+        var uploadedShare = this.uploadedList[index]
+        await axios.get(
+          `/api/files/${uploadedShare.id}`
+        ).then(function(response) {
+          _this.uploadedList[index] = response.data
+        }).catch (function (err) {
+          console.log(err.response)
+          if (err.response.status == 404) {
+            _this.uploadedList.splice(index, 1)
+          }
+        }).finally(function(response) {
+          localStorage.setItem('uploaded', JSON.stringify(_this.uploadedList))
+          _this.uploadedList = JSON.parse(localStorage.getItem('uploaded')) == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+        })
+      }
+      localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
+    },
+    shareRemoved(share) {
+      var index = this.uploadedList.indexOf(share)
+      if (index > -1) {
+        this.uploadedList.splice(index, 1)
+        localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
+      }
     }
   }
 }
 </script>
 <style>
 .mycard {
-  width: 400px;
+  width: 450px;
   height: 450px;
   margin: 10px;
   display: inline-block;
