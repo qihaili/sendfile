@@ -42,10 +42,8 @@ export default {
       `/api/files/${this.$route.params.shareId}`
     ).then(
       function (data) {
-        console.log(data.data)
         _this.response = data.data
       }, function (err) {
-        console.log(err.response)
         _this.errorMsg = err.response.data.message
       }
     ).finally(function() {

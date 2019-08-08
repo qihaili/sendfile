@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="mycard" v-if="isChooseUpload" >
+    <el-card class="mycard" style="height: 430px" v-if="isChooseUpload" >
       <div slot="header">
         上传文件
       </div>
@@ -82,16 +82,14 @@ export default {
     }
   },
   created() {
-    const _this = this
+    var _this = this
     axios.get('/api/config')
     .then(function(data) {
       _this.shareTTL = data.data.shareTTL
       _this.maxFileSize = data.data.maxFileSize
-    }, function(err) {
-      console.log('bbb')
-    })
-    .catch(function(err) {
-      console.log('aaa')
+    }).catch(function(err) {
+      console.log(err.response)
+      _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
     })
     // setInterval(this.syncUploadedShareList, 3000);
   },
@@ -109,7 +107,6 @@ export default {
     },
     handleError(err) {
       var response = JSON.parse(err.message)
-      console.log(response.message)
 
       this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'

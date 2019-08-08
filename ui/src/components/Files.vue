@@ -58,7 +58,6 @@ export default {
       this.$message.success('地址已复制')
     },
     syncShare() {
-      console.log('同步')
       var _this = this
       clearInterval(this.countdown)
       axios.get(
@@ -69,11 +68,12 @@ export default {
         }).catch (function (err) {
           if (err.response.status == 404) {
             _this.onRemoved(_this.share)
+          } else {
+            _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
           }
         })
     },
     refreshTtl() {
-      console.log('刷新时间')
       this.share.ttl -= 10000
     },
     deleteShare() {
