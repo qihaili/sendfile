@@ -80,18 +80,25 @@ export default {
     },
     deleteShare() {
       this.deleteLoading = true
-      var _this = this
-      axios.delete(
-        `/api/files/${this.share.id}`, {
-          headers: {
-            token: this.share.token
+      this.$confirm('确定删除文件共享？', {
+        type: 'warning'
+      }).then(() => {
+        axios.delete(
+          `/api/files/${this.share.id}`, {
+            headers: {
+              token: this.share.token
+            }
           }
-        }
-        ).then(function(response) {
-          _this.onRemoved(_this.share)
-        }).finally(function(response) {
-          _this.deleteLoading = false
-        })
+          ).then((response) => {
+            this.onRemoved(this.share)
+          }).finally((response)=> {
+            this.deleteLoading = false
+          })
+      }).catch(() => {
+
+      }).finally(() => {
+        this.deleteLoading = false
+      })
     },
     humanReadableDataSize(size) {
       var humanReadable
