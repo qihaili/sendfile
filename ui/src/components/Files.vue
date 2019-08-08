@@ -1,29 +1,37 @@
 <template>
   <div>
-    <div v-for="(file, index) in share.files" :key="index">
-      <div style="width: 300px; display: inline-block; text-align: left">
-        <i class="el-icon-document" style="font-size: 20px; vertical-align: middle;"></i><el-link :href="'/api/files/' + share.id + '/' + file.name" style="margin-left: 10px; vertical-align: middle; font-size: 16px; "><p style="width: 270px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</p></el-link>
+    <el-row v-for="(file, index) in share.files" :key="index">
+      <div style="display: inline-block; float: left;">
+        <!-- <el-link :href="'/api/files/' + share.id + '/' + file.name" :underline="false" style="vertical-align: middle; font-size: 16px;" icon="el-icon-document"><p style="width: 280px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px;">{{ file.name }}</p></el-link> -->
+        <el-link :href="'/api/files/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 290px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link>
       </div>
-      <div style="width: 48px; display: inline-block; text-align: right">
+      <div style="display: inline-block; float: right;">
         <span style="vertical-align: middle; font-size: 12px;">{{ humanReadableDataSize(file.size) }}</span>
       </div>
-    </div>
+    </el-row>
     <div style="margin: 10px 0px" class="el-divider el-divider--horizontal"></div>
-    <div>
-      <div style="width: 248px; display: inline-block; text-align: left;">
-        <span style="vertical-align: middle; font-size: 12px;">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span>
+    <el-row>
+      <div style="display: inline-block; float: left;">
+        <span style="vertical-align: middle; font-size: 12px;" v-if="share.ttl">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span>
       </div>
-      <div style="width: 100px; display: inline-block; text-align: right;">
-        <el-button type="text" style="padding: 0px" v-clipboard:copy="address" v-clipboard:success="onCopySuccess">复制链接</el-button>
+      <div style="display: inline-block; float: right;">
+        <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
+        <el-tooltip content="删除文件" placement="top" v-if="deletable"><el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteShare" :loading="deleteLoading"></el-button></el-tooltip>
       </div>
-    </div>
+    </el-row>
   </div>
 </template>
 <script>
 import axios from 'axios'
 export default {
   props: {
-    share: Object,
+    share: {
+      type: Object,
+    },
+    deletable: {
+      type: Boolean,
+      default: false
+    },
     onRemoved: {
       type: Function,
       required: true
@@ -32,10 +40,12 @@ export default {
   data() {
     return {
       address: window.location.href + (this.$route.path == '/' ? this.share.id : ''),
-      scheduledJob: null
+      scheduledJob: null,
+      deleteLoading: false
     }
   },
   created() {
+    this.syncShare()
     this.scheduledJob = setInterval(this.syncShare, 3000);
   },
   destroyed() {
@@ -47,7 +57,6 @@ export default {
     },
     syncShare() {
       var _this = this
-      console.log(this.share)
       axios.get(
           `/api/files/${this.share.id}`
         ).then(function(response) {
@@ -56,6 +65,17 @@ export default {
           if (err.response.status == 404) {
             _this.onRemoved(_this.share)
           }
+        })
+    },
+    deleteShare() {
+      this.deleteLoading = true
+      var _this = this
+      axios.delete(
+        `/api/files/${this.share.id}`
+        ).then(function(response) {
+          _this.onRemoved(_this.share)
+        }).finally(function(response) {
+          _this.deleteLoading = false
         })
     },
     humanReadableDataSize(size) {
@@ -85,14 +105,14 @@ export default {
       }
       if (duration > (1000 * 60)) {
         humanReadable += parseInt(duration / (1000 * 60)) + '分钟'
-        duration = duration % (1000 * 60)
+        // duration = duration % (1000 * 60)
       }
-      if (duration > 1000) {
-        humanReadable += parseInt(duration / 1000) + '秒'
-        duration = duration % 1000
-      }
+      // if (duration > 1000) {
+      //   humanReadable += parseInt(duration / 1000) + '秒'
+      //   duration = duration % 1000
+      // }
       if (humanReadable == '') {
-        humanReadable = '1秒内'
+        humanReadable = '1分钟内'
       } else {
         humanReadable += '后'
       }

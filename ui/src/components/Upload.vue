@@ -51,33 +51,12 @@
       </div>
     </el-card>
     <el-card class="mycard" v-if="uploadedList.length > 0">
-      <el-card v-for="(uploadedShare, index) in uploadedList" :key="index" style="margin: 10px">
-        <files :share="uploadedShare" :on-removed="shareRemoved"></files>
-      </el-card>
-      <!-- <el-card v-for="(uploadedFile, index) in uploadedList" :key="index" style="margin: 10px">
-        <el-table :data="uploadedFile.files" size="mini" :show-header=false>
-          <el-table-column>
-            <template slot-scope="file">
-              <i class="el-icon-document" style="font-size: 20px; vertical-align: middle;"></i><el-link :href="'/api/files/' + $route.params.shareId + '/' + file.row.name" style="margin-left: 10px; vertical-align: middle;">{{ file.row.name }}</el-link>
-            </template>
-          </el-table-column>
-          <el-table-column min-width="20px">
-            <template slot-scope="file">
-              <span style="vertical-align: middle;">{{ humanReadableDataSize(file.row.size) }}</span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card> -->
+      <div>
+        <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
+          <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
+        </el-card>
+      </div>
     </el-card>
-    <!-- <el-card class="mycard" v-if="isChooseDownload">
-      <div slot="header">
-        下载文件
-      </div>
-      <div style="text-align: left; margin-top: 70px">
-        <span>输入提取码下载文件</span>
-        <el-input v-model="shareId" placeholder="提取码"><el-button slot="append" @click="showFiles(shareId)">提取文件</el-button></el-input>
-      </div>
-    </el-card> -->
   </div>
 </template>
 
@@ -99,7 +78,6 @@ export default {
       speed: null,
       lastLoaded: 0,
       lastLoadTime: null,
-      fileList: [],
       shareTTL: null,
       maxFileSize: null,
       uploadedList: JSON.parse(localStorage.getItem('uploaded')) == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
@@ -131,8 +109,10 @@ export default {
       this.share = response
       this.uploadStatus = 'success'
       this.speed = null
-      this.uploadedList.push(this.share)
-      localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
+      // this.share.ttl = null
+      this.uploadedList.unshift(this.share)
+      this.save()
+      // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(err) {
       var response = JSON.parse(err.message)
@@ -181,11 +161,6 @@ export default {
     showFiles(share) {
       this.$router.push(`/${share}`)
     },
-    changeFileList(file, fileList) {
-      console.log(file, file.name)
-      console.log(fileList)
-      console.log(this.fileList)
-    },
     onCopySuccess(e) {
       this.$message.success('地址已复制')
     },
@@ -193,32 +168,28 @@ export default {
       this.isChooseUpload = true
       this.isChooseDownload = true
     },
-    async syncUploadedShareList() {
-      var _this = this
-      for (var index in this.uploadedList) {
-        var uploadedShare = this.uploadedList[index]
-        await axios.get(
-          `/api/files/${uploadedShare.id}`
-        ).then(function(response) {
-          _this.uploadedList[index] = response.data
-        }).catch (function (err) {
-          console.log(err.response)
-          if (err.response.status == 404) {
-            _this.uploadedList.splice(index, 1)
-          }
-        }).finally(function(response) {
-          localStorage.setItem('uploaded', JSON.stringify(_this.uploadedList))
-          _this.uploadedList = JSON.parse(localStorage.getItem('uploaded')) == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
-        })
-      }
-      localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
-    },
     shareRemoved(share) {
-      var index = this.uploadedList.indexOf(share)
+      // console.log('shareRemoved')
+      // var index = this.uploadedList.indexOf(share)
+      var index = -1
+      for(var i=0; i<this.uploadedList.length; i++) {
+        var uploadedShare = this.uploadedList[i]
+        if(uploadedShare.id == share.id) {
+          index = i
+          break
+        }
+      }
       if (index > -1) {
         this.uploadedList.splice(index, 1)
-        localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
+        this.save()
       }
+    },
+    save() {
+      var saveList = JSON.parse(JSON.stringify(this.uploadedList))
+      for(var share of saveList) {
+        share.ttl = null
+      }
+      localStorage.setItem('uploaded', JSON.stringify(saveList))
     }
   }
 }
@@ -226,8 +197,9 @@ export default {
 <style>
 .mycard {
   width: 450px;
-  height: 450px;
+  /* height: 450px; */
   margin: 10px;
   display: inline-block;
+  vertical-align: top;
 }
 </style>

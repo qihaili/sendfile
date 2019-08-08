@@ -23,10 +23,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.servlet.MultipartConfigElement;
 
-// TODO 增加配置：上传文件大小限制，默认1G
-// TODO 增加配置：上传文件过期时间，默认24小时
-// TODO 增加配置：轮询扫描过期文件的间隔时间，默认1小时
-// TODO 页面上需要显示这些配置信息，从服务端获取
+// TODO 上传文件成功后服务端生成一个密钥返回给客户端，客户端保存密钥，删除文件时需带上密钥。
+//  密钥可以作为Share的一个参数。每一个Share的密钥都不同
 
 @SpringBootApplication
 @EnableSwagger2

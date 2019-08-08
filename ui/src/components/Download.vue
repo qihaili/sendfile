@@ -12,22 +12,6 @@
         <p>{{ errorMsg }}</p>
       </div>
     </div>
-    <!-- <el-table v-if="response == null" :data="files" size="mini" :show-header=false>
-      <el-table-column>
-        <template slot-scope="file">
-          <i class="el-icon-document" style="font-size: 20px; vertical-align: middle;"></i><el-link :href="'/api/files/' + $route.params.shareId + '/' + file.row.name" style="margin-left: 10px; vertical-align: middle;">{{ file.row.name }}</el-link>
-        </template>
-      </el-table-column>
-      <el-table-column min-width="20px">
-        <template slot-scope="file">
-          <span style="vertical-align: middle;">{{ humanReadableDataSize(file.row.size) }}</span>
-        </template>
-      </el-table-column>
-    </el-table> -->
-    <!-- <div v-else>
-      <p>{{ response.status }} {{ response.statusText }}</p>
-      <p>未找到文件，提取码错误</p>
-    </div> -->
   </el-card>
 </template>
 <script>
