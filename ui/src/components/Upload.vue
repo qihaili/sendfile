@@ -45,9 +45,8 @@
     </el-card>
     <el-card class="mycard" v-if="uploadedList.length > 0">
       <div>
-        <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.share.id" style="margin: 10px 0px;">
+        <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
           <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
-          <!-- <files v-model="share" :on-removed="shareRemoved" :deletable="true"></files> -->
         </el-card>
       </div>
     </el-card>
@@ -74,7 +73,7 @@ export default {
       lastLoadTime: null,
       shareTTL: null,
       maxFileSize: null,
-      uploadedList: JSON.parse(localStorage.getItem('uploaded')) == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+      uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
     }
   },
   computed: {
@@ -102,10 +101,9 @@ export default {
       this.uploadStatus = 'success'
       this.speed = null
       // this.share.ttl = null
-      this.uploadedList.unshift({share: this.share})
+      this.uploadedList.unshift(this.share)
       this.save()
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
-      console.log(this.share)
     },
     handleError(err) {
       var response = JSON.parse(err.message)
@@ -164,7 +162,7 @@ export default {
       var index = -1
       for(var i=0; i<this.uploadedList.length; i++) {
         var uploadedShare = this.uploadedList[i]
-        if(uploadedShare.share.id == share.share.id) {
+        if(uploadedShare.id == share.id) {
           index = i
           break
         }

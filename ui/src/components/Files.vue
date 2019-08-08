@@ -1,9 +1,9 @@
 <template>
   <div>
-    <el-row v-for="(file, index) in share.share.files" :key="index">
+    <el-row v-for="(file, index) in share.files" :key="index">
       <div style="display: inline-block; float: left;">
         <!-- <el-link :href="'/api/files/' + share.id + '/' + file.name" :underline="false" style="vertical-align: middle; font-size: 16px;" icon="el-icon-document"><p style="width: 280px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px;">{{ file.name }}</p></el-link> -->
-        <el-link :href="'/api/files/' + share.share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 290px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link>
+        <el-link :href="'/api/files/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 290px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link>
       </div>
       <div style="display: inline-block; float: right;">
         <span style="vertical-align: middle; font-size: 12px;">{{ humanReadableDataSize(file.size) }}</span>
@@ -12,7 +12,7 @@
     <div style="margin: 10px 0px" class="el-divider el-divider--horizontal"></div>
     <el-row>
       <div style="display: inline-block; float: left;">
-        <span style="vertical-align: middle; font-size: 12px;" v-if="share.share.ttl">文件将于 {{ humanreadableDuration(share.share.ttl) }} 过期</span>
+        <span style="vertical-align: middle; font-size: 12px;" v-if="share.ttl">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span>
       </div>
       <div style="display: inline-block; float: right;">
         <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
@@ -40,7 +40,7 @@ export default {
   },
   data() {
     return {
-      address: window.location.href + (this.$route.path == '/' ? this.share.share.id : ''),
+      address: window.location.href + (this.$route.path == '/' ? this.share.id : ''),
       syncSharePolling: null,
       countdown: null,
       deleteLoading: false
@@ -61,11 +61,11 @@ export default {
       var _this = this
       clearInterval(this.countdown)
       axios.get(
-          `/api/files/${this.share.share.id}`
+          `/api/files/${this.share.id}`
         ).then(function(response) {
-          // _this.share.ttl = response.data.ttl
-          _this.share.share = response.data
-          console.log(_this.share.share)
+          _this.share.ttl = response.data.ttl
+          _this.share.files = response.data.files
+          // _this.share = response.data
           _this.countdown = setInterval(_this.refreshTtl, 10000)
         }).catch (function (err) {
           if (err.response.status == 404) {
@@ -76,7 +76,7 @@ export default {
         })
     },
     refreshTtl() {
-      this.share.share.ttl -= 10000
+      this.share.ttl -= 10000
     },
     deleteShare() {
       this.deleteLoading = true
@@ -84,7 +84,7 @@ export default {
       axios.delete(
         `/api/files/${this.share.id}`, {
           headers: {
-            token: this.share.share.token
+            token: this.share.token
           }
         }
         ).then(function(response) {

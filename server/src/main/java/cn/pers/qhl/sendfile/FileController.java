@@ -65,7 +65,7 @@ public class FileController {
             objectMapper.writeValue(new File(shareDir, ".share"), shareInfo);
 
             Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
-            
+
             ArrayList<ShareFile> shareFiles = new ArrayList<>();
             for (File file : shareDir.listFiles()) {
                 ShareFile shareFile = new ShareFile();
