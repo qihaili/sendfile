@@ -141,8 +141,6 @@ export default {
       return false;
     },
     chooseUpload(file) {
-      console.log('最大文件大小：' + this.maxFileSize + 'MB')
-      console.log(file.size)
       if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
         this.$message.error('文件过大，不能超过' + this.maxFileSize + 'MB')
         return false

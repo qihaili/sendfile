@@ -23,6 +23,7 @@
 </template>
 <script>
 import axios from 'axios'
+import { clearInterval, setInterval } from 'timers';
 export default {
   props: {
     share: {
@@ -40,32 +41,40 @@ export default {
   data() {
     return {
       address: window.location.href + (this.$route.path == '/' ? this.share.id : ''),
-      scheduledJob: null,
+      syncSharePolling: null,
+      countdown: null,
       deleteLoading: false
     }
   },
   created() {
     this.syncShare()
-    this.scheduledJob = setInterval(this.syncShare, 3000);
+    this.syncSharePolling = setInterval(this.syncShare, 120000);  // 两分钟
   },
   destroyed() {
-    clearInterval(this.scheduledJob)
+    clearInterval(this.syncSharePolling)
   },
   methods: {
     onCopySuccess(e) {
       this.$message.success('地址已复制')
     },
     syncShare() {
+      console.log('同步')
       var _this = this
+      clearInterval(this.countdown)
       axios.get(
           `/api/files/${this.share.id}`
         ).then(function(response) {
           _this.share.ttl = response.data.ttl
+          _this.countdown = setInterval(_this.refreshTtl, 10000)
         }).catch (function (err) {
           if (err.response.status == 404) {
             _this.onRemoved(_this.share)
           }
         })
+    },
+    refreshTtl() {
+      console.log('刷新时间')
+      this.share.ttl -= 10000
     },
     deleteShare() {
       this.deleteLoading = true

@@ -39,6 +39,7 @@ public class Util {
     }
 
     public static String genToken() {
-        return RandomStringUtils.random(16, "abcdefghijkmnpqrstuvwxyz23456789");
+//        return RandomStringUtils.random(32, "abcdefghijkmnpqrstuvwxyz23456789");
+        return RandomStringUtils.randomAlphanumeric(32);
     }
 }

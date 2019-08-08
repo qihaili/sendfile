@@ -23,9 +23,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import javax.servlet.MultipartConfigElement;
 
-// TODO 上传文件成功后服务端生成一个密钥返回给客户端，客户端保存密钥，删除文件时需带上密钥。
-//  密钥可以作为Share的一个参数。每一个Share的密钥都不同
-
 @SpringBootApplication
 @EnableSwagger2
 @EnableAsync(proxyTargetClass = true)
