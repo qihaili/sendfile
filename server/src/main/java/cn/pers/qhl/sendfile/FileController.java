@@ -35,7 +35,7 @@ public class FileController {
         File shareDir = new File(Util.REPO_ROOT, shareId);
         shareDir.mkdirs();
 
-        ArrayList<ShareFile> shareFiles = new ArrayList<>();
+//        ArrayList<ShareFile> shareFiles = new ArrayList<>();
         for (MultipartFile file : files) {
             if (config.getShare().getMaxFileSize() > 0 && file.getSize() > config.getShare().getMaxFileSize().longValue() * 1024 * 1024) {
                 throw new BadRequestException("文件过大");
@@ -45,10 +45,10 @@ public class FileController {
             try {
                 file.transferTo(destFile.getCanonicalFile());
 
-                ShareFile shareFile = new ShareFile();
-                shareFile.setName(file.getOriginalFilename());
-                shareFile.setSize(file.getSize());
-                shareFiles.add(shareFile);
+//                ShareFile shareFile = new ShareFile();
+//                shareFile.setName(file.getOriginalFilename());
+//                shareFile.setSize(file.getSize());
+//                shareFiles.add(shareFile);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
                 throw new ServerException(e);
@@ -56,6 +56,7 @@ public class FileController {
         }
 
         try {
+
             String token = Util.genToken();
             ShareInfo shareInfo = new ShareInfo();
             shareInfo.setToken(token);
@@ -64,6 +65,14 @@ public class FileController {
             objectMapper.writeValue(new File(shareDir, ".share"), shareInfo);
 
             Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+            
+            ArrayList<ShareFile> shareFiles = new ArrayList<>();
+            for (File file : shareDir.listFiles()) {
+                ShareFile shareFile = new ShareFile();
+                shareFile.setName(file.getName());
+                shareFile.setSize(file.length());
+                shareFiles.add(shareFile);
+            }
 
             Share share = new Share();
             share.setId(shareId);
