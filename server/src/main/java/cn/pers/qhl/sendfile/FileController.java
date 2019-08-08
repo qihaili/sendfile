@@ -1,6 +1,9 @@
 package cn.pers.qhl.sendfile;
 
 import cn.pers.qhl.sendfile.config.SendFileConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +15,7 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,13 +55,26 @@ public class FileController {
             }
         }
 
-        Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+        try {
+            String token = Util.genToken();
+            ShareInfo shareInfo = new ShareInfo();
+            shareInfo.setToken(token);
 
-        Share share = new Share();
-        share.setId(shareId);
-        share.setTtl(ttl);
-        share.setFiles(shareFiles);
-        return share;
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(new File(shareDir, ".share"), shareInfo);
+
+            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+
+            Share share = new Share();
+            share.setId(shareId);
+            share.setTtl(ttl);
+            share.setFiles(shareFiles);
+            share.setToken(token);
+
+            return share;
+        } catch (IOException e) {
+            throw new ServerException(e);
+        }
     }
 
     @GetMapping("{shareId}/{filePath}")
@@ -102,13 +115,23 @@ public class FileController {
     }
 
     @DeleteMapping("{shareId}")
-    void delete(@PathVariable String shareId) {
+    void delete(@PathVariable String shareId, @RequestHeader String token) {
         File shareDir = Util.getShareDir(shareId);
-        FileSystemUtils.deleteRecursively(shareDir);
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            ShareInfo shareInfo = objectMapper.readValue(new File(shareDir, ".share"), ShareInfo.class);
+            if (shareInfo.getToken().equals(token)) {
+                FileSystemUtils.deleteRecursively(shareDir);
+//                try {
+//                    Thread.sleep(5000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+            } else {
+                throw new UnauthorizedException();
+            }
+        } catch (IOException e) {
+            throw new ServerException(e);
         }
     }
 

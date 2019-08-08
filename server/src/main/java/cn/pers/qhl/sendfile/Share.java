@@ -8,6 +8,8 @@ public class Share {
 
     private Long ttl;
 
+    private String token;
+
     private List<ShareFile> files;
 
     public String getId() {
@@ -24,6 +26,14 @@ public class Share {
 
     public void setTtl(Long ttl) {
         this.ttl = ttl;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public List<ShareFile> getFiles() {

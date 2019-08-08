@@ -5,19 +5,12 @@
         上传文件
       </div>
       <div v-if="isChooseUpload && !isChooseDownload">
-        <!-- <upload-progress :percentage="uploadPercentage" :speed="speed"/> -->
         <el-progress type="circle" :percentage="uploadPercentage" :status="uploadStatus"/>
         <div style="height: 20px; line-height: 20px">
           <span style="font-size: 14px">{{ speed }}</span>
         </div>
-        <!-- <el-divider/> -->
         <div v-if="share != null" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
-          <!-- <div style="margin: 20px 5px">
-            <span>提取码</span>
-            <el-input :value="shareId"></el-input>
-            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝提取码，在首页中输入，并点击“提取文件”</span>
-          </div> -->
           <div style="margin: 20px 5px">
             <span>提取地址：</span>
             <el-input :value="address">

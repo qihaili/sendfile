@@ -71,7 +71,11 @@ export default {
       this.deleteLoading = true
       var _this = this
       axios.delete(
-        `/api/files/${this.share.id}`
+        `/api/files/${this.share.id}`, {
+          headers: {
+            token: this.share.token
+          }
+        }
         ).then(function(response) {
           _this.onRemoved(_this.share)
         }).finally(function(response) {
