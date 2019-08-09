@@ -1,5 +1,7 @@
 package cn.pers.qhl.sendfile;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import java.io.File;
 
 public class Util {
@@ -36,22 +38,8 @@ public class Util {
         return Long.toString(lastTime, 36);
     }
 
-//    public static String parseDuration(String duration) {
-//        PeriodFormatter formatter = new PeriodFormatterBuilder()
-//                .appendMonths().appendSuffix("M").appendSeparator(" ")
-//                .appendDays().appendSuffix("D").appendSeparator(" ")
-//                .appendHours().appendSuffix("H").appendSeparator(" ")
-//                .appendMinutes().appendSuffix("M").appendSeparator(" ")
-//                .appendSeconds().appendSuffix("S").toFormatter();
-//        Period period = formatter.parsePeriod(duration);
-//
-//        String humanReadable = "";
-//        humanReadable += period.getMonths() == 0 ? "" : (period.getMonths() + "月");
-//        humanReadable += period.getDays() == 0 ? "" : (period.getDays() + "天");
-//        humanReadable += period.getHours() == 0 ? "" : (period.getHours() + "小时");
-//        humanReadable += period.getMinutes() == 0 ? "" : (period.getMinutes() + "分钟");
-//        humanReadable += period.getSeconds() == 0 ? "" : (period.getSeconds() + "秒");
-//
-//        return humanReadable;
-//    }
+    public static String genToken() {
+//        return RandomStringUtils.random(32, "abcdefghijkmnpqrstuvwxyz23456789");
+        return RandomStringUtils.randomAlphanumeric(32);
+    }
 }

@@ -1,27 +1,25 @@
 <template>
   <div>
-    <el-card class="mycard" v-if="isChooseUpload" >
+    <el-card class="mycard" style="height: 430px" v-if="isChooseUpload" >
       <div slot="header">
         上传文件
       </div>
       <div v-if="isChooseUpload && !isChooseDownload">
-        <!-- <upload-progress :percentage="uploadPercentage" :speed="speed"/> -->
         <el-progress type="circle" :percentage="uploadPercentage" :status="uploadStatus"/>
         <div style="height: 20px; line-height: 20px">
           <span style="font-size: 14px">{{ speed }}</span>
         </div>
-        <!-- <el-divider/> -->
-        <div v-if="shareId != null" style="text-align: left;">
+        <div v-if="share != null" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <div style="margin: 20px 5px">
-            <span>提取码</span>
-            <el-input :value="shareId"></el-input>
-            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝提取码，在首页中输入，并点击“提取文件”</span>
-          </div>
-          <div style="margin: 20px 5px">
             <span>提取地址：</span>
-            <el-input :value="address"></el-input>
+            <el-input :value="address">
+              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制地址</el-button>
+            </el-input>
             <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝地址，粘贴到浏览器地址栏中，并打开页面</span>
+          </div>
+          <div style="text-align: center;">
+            <el-link type="primary" @click="backToHome">再次上传</el-link>
           </div>
         </div>
         <div v-else style="margin: 50px 5px">
@@ -45,13 +43,11 @@
         </el-upload>
       </div>
     </el-card>
-    <el-card class="mycard" v-if="isChooseDownload">
-      <div slot="header">
-        下载文件
-      </div>
-      <div style="text-align: left; margin-top: 70px">
-        <span>输入提取码下载文件</span>
-        <el-input v-model="shareId" placeholder="提取码"><el-button slot="append" @click="showFiles(shareId)">提取文件</el-button></el-input>
+    <el-card class="mycard" v-if="uploadedList.length > 0">
+      <div>
+        <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
+          <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
+        </el-card>
       </div>
     </el-card>
   </div>
@@ -59,56 +55,58 @@
 
 <script>
 import axios from 'axios'
-// import UploadProgress from './UploadProgress'
+import files from './Files'
 export default {
-  // components: {
-  //   'upload-progress': UploadProgress
-  // },
+  components: {
+    files
+  },
   data() {
     return {
       isSuccess: false,
       isChooseUpload: true,
       isChooseDownload: true,
-      shareId: null,
+      share: null,
       uploadPercentage: 0,
       uploadStatus: null,
       speed: null,
       lastLoaded: 0,
       lastLoadTime: null,
-      fileList: [],
       shareTTL: null,
-      maxFileSize: null
+      maxFileSize: null,
+      uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
     }
   },
   computed: {
     address: function() {
-      return window.location.href + this.shareId
+      return window.location.href + this.share.id
     }
   },
   created() {
-    const _this = this
+    var _this = this
     axios.get('/api/config')
     .then(function(data) {
-      console.log(data.data)
       _this.shareTTL = data.data.shareTTL
       _this.maxFileSize = data.data.maxFileSize
-    }, function(err) {
-      console.log('bbb')
+    }).catch(function(err) {
+      console.log(err.response)
+      _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
     })
-    .catch(function(err) {
-      console.log('aaa')
-    })
+    // setInterval(this.syncUploadedShareList, 3000);
   },
   methods: {
     handleSuccess(response) {
       this.$message.success('上传成功')
       this.isSuccess = true
-      this.shareId = response
+      this.share = response
       this.uploadStatus = 'success'
+      this.speed = null
+      // this.share.ttl = null
+      this.uploadedList.unshift(this.share)
+      this.save()
+      // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(err) {
       var response = JSON.parse(err.message)
-      console.log(response.message)
 
       this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
@@ -140,8 +138,6 @@ export default {
       return false;
     },
     chooseUpload(file) {
-      console.log('最大文件大小：' + this.maxFileSize + 'MB')
-      console.log(file.size)
       if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
         this.$message.error('文件过大，不能超过' + this.maxFileSize + 'MB')
         return false
@@ -150,22 +146,48 @@ export default {
       this.isChooseDownload = false
       this.lastLoadTime = new Date().getTime()
     },
-    showFiles(shareId) {
-      this.$router.push(`/${shareId}`)
+    showFiles(share) {
+      this.$router.push(`/${share}`)
     },
-    changeFileList(file, fileList) {
-      console.log(file, file.name)
-      console.log(fileList)
-      console.log(this.fileList)
+    onCopySuccess(e) {
+      this.$message.success('地址已复制')
+    },
+    backToHome() {
+      this.isChooseUpload = true
+      this.isChooseDownload = true
+    },
+    shareRemoved(share) {
+      // console.log('shareRemoved')
+      // var index = this.uploadedList.indexOf(share)
+      var index = -1
+      for(var i=0; i<this.uploadedList.length; i++) {
+        var uploadedShare = this.uploadedList[i]
+        if(uploadedShare.id == share.id) {
+          index = i
+          break
+        }
+      }
+      if (index > -1) {
+        this.uploadedList.splice(index, 1)
+        this.save()
+      }
+    },
+    save() {
+      var saveList = JSON.parse(JSON.stringify(this.uploadedList))
+      for(var share of saveList) {
+        share.ttl = null
+      }
+      localStorage.setItem('uploaded', JSON.stringify(saveList))
     }
   }
 }
 </script>
 <style>
 .mycard {
-  width: 400px;
-  height: 500px;
+  width: 450px;
+  /* height: 450px; */
   margin: 10px;
   display: inline-block;
+  vertical-align: top;
 }
 </style>
