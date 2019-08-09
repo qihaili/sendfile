@@ -1,18 +1,25 @@
 <template>
-  <el-card style="width: 400px; height: 400px; display: inline-block;" v-loading="loading">
-    <div slot="header">
-      文件（点击文件名下载）
-    </div>
-    <div v-if="loading">
-      <p>正在读取文件...</p>
-    </div>
-    <div v-else>
-      <files :share="response" v-if="response" :on-removed="shareRemoved"></files>
-      <div v-else>
-        <p>{{ errorMsg }}</p>
+  <div>
+    <el-card style="width: 400px; height: 400px; display: inline-block;">
+      <div slot="header">
+        文件（点击文件名下载）
       </div>
-    </div>
-  </el-card>
+      <div style="height: 300px; position: relative">
+          <div v-if="loading">
+            <p>正在读取文件...</p>
+          </div>
+          <div v-else>
+            <files :share="response" v-if="response" :on-removed="shareRemoved"></files>
+            <div v-else>
+              <p>{{ errorMsg }}</p>
+            </div>
+          </div>
+          <div style="position: absolute; bottom: 0px; width: 100%;">
+            <el-link type="primary" @click="gotoUpload">使用SendFile共享文件</el-link>
+          </div>
+      </div>
+    </el-card>
+  </div>
 </template>
 <script>
 import axios from 'axios'
@@ -33,6 +40,9 @@ export default {
     shareRemoved(share) {
       this.errorMsg = '文件已过期'
       this.response = null
+    },
+    gotoUpload() {
+      this.$router.push('/')
     }
   },
   created() {

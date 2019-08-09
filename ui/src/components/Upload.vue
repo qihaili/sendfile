@@ -12,18 +12,18 @@
         <div v-if="share != null" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <div style="margin: 20px 5px">
-            <span>提取地址：</span>
+            <span>下载链接：</span>
             <el-input :value="address">
-              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制地址</el-button>
+              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制链接</el-button>
             </el-input>
-            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>拷贝地址，粘贴到浏览器地址栏中，并打开页面</span>
+            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</span>
           </div>
           <div style="text-align: center;">
             <el-link type="primary" @click="backToHome">再次上传</el-link>
           </div>
         </div>
         <div v-else style="margin: 50px 5px">
-          <span>等待上传成功，生成提取码。。。</span>
+          <span>正在上传，成功后生成下载链接。。。</span>
         </div>
       </div>
       <div v-else>
@@ -88,7 +88,6 @@ export default {
       _this.shareTTL = data.data.shareTTL
       _this.maxFileSize = data.data.maxFileSize
     }).catch(function(err) {
-      console.log(err.response)
       _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
     })
     // setInterval(this.syncUploadedShareList, 3000);
@@ -146,10 +145,7 @@ export default {
       this.isChooseDownload = false
       this.lastLoadTime = new Date().getTime()
     },
-    showFiles(share) {
-      this.$router.push(`/${share}`)
-    },
-    onCopySuccess(e) {
+    onCopySuccess() {
       this.$message.success('地址已复制')
     },
     backToHome() {
