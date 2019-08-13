@@ -1,22 +1,37 @@
 <template>
   <div>
-    <el-card class="mycard" style="height: 430px" v-if="isChooseUpload" >
-      <div slot="header">
+    <el-card class="mycard">
+      <!-- <div slot="header">
         上传文件
+      </div> -->
+      <div v-if="!isChooseUpload">
+        <el-upload
+          ref="upload"
+          action=""
+          :show-file-list="true"
+          :auto-upload="false"
+          :multiple="true"
+          :on-change="onChange"
+          style="text-align: left;"
+          >
+          <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button>
+          <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 20px">上传</el-button>
+          <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
+        </el-upload>
       </div>
-      <div v-if="isChooseUpload && !isChooseDownload">
-        <el-progress type="circle" :percentage="uploadPercentage" :status="uploadStatus"/>
+      <div v-else>
+        <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus"/>
         <div style="height: 20px; line-height: 20px">
           <span style="font-size: 14px">{{ speed }}</span>
         </div>
-        <div v-if="share != null" style="text-align: left;">
+        <div v-if="share" style="text-align: left;">
           <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <div style="margin: 20px 5px">
-            <span>下载链接：</span>
-            <el-input :value="address">
+            <el-row>下载链接：</el-row>
+            <el-input :value="address" style="min-width: 350px;">
               <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制链接</el-button>
             </el-input>
-            <span style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</span>
+            <el-row style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
           </div>
           <div style="text-align: center;">
             <el-link type="primary" @click="backToHome">再次上传</el-link>
@@ -26,45 +41,46 @@
           <span>正在上传，成功后生成下载链接。。。</span>
         </div>
       </div>
-      <div v-else>
-        <el-upload
-          drag
-          action="/api/files/upload"
-          :show-file-list="false"
-          :before-upload="chooseUpload"
-          :before-remove="handleRemove"
-          :on-success="handleSuccess"
-          :on-error="handleError"
-          :on-progress="showProgress"
-          >
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
-        </el-upload>
-      </div>
     </el-card>
-    <el-card class="mycard" v-if="uploadedList.length > 0">
-      <div>
+    <!-- <el-card class="mycard" v-if="isChooseUpload">
+      <el-upload
+        ref="upload"
+        :action="uploadUrl"
+        :show-file-list="true"
+        :auto-upload="false"
+        :multiple="true"
+        :on-success="handleSuccess"
+        :on-error="handleError"
+        :on-progress="showProgress"
+        style="text-align: left"
+        >
+        <el-button slot="trigger" type="primary">选择文件</el-button>
+        <el-button type="success" icon="el-icon-upload" @click="submitUpload" style="margin-left: 10px;">开始上传</el-button>
+        <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
+      </el-upload>
+    </el-card> -->
+    <el-collapse-transition>
+      <el-card class="mycard" v-if="uploadedList.length > 0">
         <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
           <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
         </el-card>
-      </div>
-    </el-card>
+      </el-card>
+    </el-collapse-transition>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import files from './Files'
+import { setTimeout } from 'timers';
+import { format } from 'path';
 export default {
   components: {
     files
   },
   data() {
     return {
-      isSuccess: false,
-      isChooseUpload: true,
-      isChooseDownload: true,
+      isChooseUpload: false,
       share: null,
       uploadPercentage: 0,
       uploadStatus: null,
@@ -73,7 +89,8 @@ export default {
       lastLoadTime: null,
       shareTTL: null,
       maxFileSize: null,
-      uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+      uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded')),
+      fileList: null
     }
   },
   computed: {
@@ -93,6 +110,53 @@ export default {
     // setInterval(this.syncUploadedShareList, 3000);
   },
   methods: {
+    submitUpload() {
+      var fd = new FormData()
+      for(var file of this.fileList) {
+        fd.append('file', file.raw)
+      }
+      axios.post(
+        '/api/files/upload',
+        fd,
+        {
+          onUploadProgress: this.showProgress
+        }
+      ).then((response) => {
+        this.handleSuccess(response.data)
+      }).catch((error) => {
+        console.log(error)
+      })
+      this.isChooseUpload = true
+    },
+    onChange(file, fileList) {
+      this.fileList = fileList
+    },
+    uploadFile(file) {
+      console.log(file)
+      var fd = new FormData()
+      fd.append('file', file.file)
+      console.log(this.share.files.length)
+      axios.post(
+        `/api/shares/${this.share.id}`,
+        fd
+      ).then((response) => {
+        console.log('success', response)
+        this.share = response.data
+        if(this.share.files.length == 1) {
+          this.uploadedList.unshift(this.share)
+        } else {
+          for(var i=0; i<this.uploadedList.length; i++) {
+            if(this.uploadedList[i].id == this.share.id) {
+              // this.uploadedList[i] = this.share
+              this.uploadedList.splice(i, 1, this.share)
+              break
+            }
+          }
+        }
+        file.onSuccess()
+        return true
+      })
+    },
     handleSuccess(response) {
       this.$message.success('上传成功')
       this.isSuccess = true
@@ -111,7 +175,8 @@ export default {
       this.uploadStatus = 'exception'
     },
     showProgress(event) {
-      this.uploadPercentage = Number(event.percent.toFixed(0))
+      // this.uploadPercentage = Number(event.percent.toFixed(0))
+      this.uploadPercentage = parseInt(event.loaded*100 / event.total)
 
       // 计算速度
       var now = new Date().getTime()
@@ -149,8 +214,12 @@ export default {
       this.$message.success('地址已复制')
     },
     backToHome() {
-      this.isChooseUpload = true
-      this.isChooseDownload = true
+      this.isChooseUpload = false
+      this.uploadStatus = null
+      this.uploadPercentage = 0
+      this.share = null
+      this.fileList = null
+      // this.isChooseDownload = true
     },
     shareRemoved(share) {
       // console.log('shareRemoved')
@@ -180,7 +249,7 @@ export default {
 </script>
 <style>
 .mycard {
-  width: 450px;
+  /* width: auto; */
   /* height: 450px; */
   margin: 10px;
   display: inline-block;

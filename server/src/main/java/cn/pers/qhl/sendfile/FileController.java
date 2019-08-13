@@ -28,6 +28,9 @@ public class FileController {
     @Autowired
     private SendFileConfig config;
 
+    @Autowired
+    private ShareService shareService;
+
     @PostMapping(value = "upload")
     Share upload(@RequestPart("file") MultipartFile[] files) {
 //        String shareId = UUID.randomUUID().toString();
@@ -63,7 +66,7 @@ public class FileController {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(new File(shareDir, ".share"), shareInfo);
 
-            return getShare(shareId);
+            return shareService.getShare(shareId);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new ServerException(e);
@@ -118,7 +121,7 @@ public class FileController {
 
     @GetMapping("{shareId}")
     Share get(@PathVariable String shareId) {
-        Share share = getShare(shareId);
+        Share share = shareService.getShare(shareId);
         share.setToken(null);
 //        File shareDir = Util.getShareDir(shareId);
 //
@@ -140,41 +143,9 @@ public class FileController {
         return share;
     }
 
-    private Share getShare(String shareId) {
-        File shareDir = Util.getShareDir(shareId);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Share shareInfo = objectMapper.readValue(new File(shareDir, ".share"), Share.class);
-
-            ArrayList<ShareFile> files = new ArrayList<>();
-            for (File file : shareDir.listFiles()) {
-                if (!".share".equals(file.getName())) {
-                    ShareFile shareFile = new ShareFile();
-                    shareFile.setName(file.getName());
-                    shareFile.setSize(file.length());
-                    files.add(shareFile);
-                }
-            }
-
-            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
-
-            Share share = new Share();
-            share.setId(shareId);
-            share.setTtl(ttl);
-            share.setFiles(files);
-            share.setToken(shareInfo.getToken());
-
-            return share;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new ServerException(e);
-        }
-    }
-
     @DeleteMapping("{shareId}")
     void delete(@PathVariable String shareId, @RequestHeader String token) {
-        Share share = getShare(shareId);
+        Share share = shareService.getShare(shareId);
         if (share.getToken().equals(token)) {
             FileSystemUtils.deleteRecursively(Util.getShareDir(shareId));
         }

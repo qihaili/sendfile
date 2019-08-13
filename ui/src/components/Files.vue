@@ -3,10 +3,10 @@
     <el-row v-for="(file, index) in share.files" :key="index">
       <div style="display: inline-block; float: left;">
         <!-- <el-link :href="'/api/files/' + share.id + '/' + file.name" :underline="false" style="vertical-align: middle; font-size: 16px;" icon="el-icon-document"><p style="width: 280px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px;">{{ file.name }}</p></el-link> -->
-        <el-link :href="'/api/files/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 290px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link>
+        <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/files/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link></el-tooltip>
       </div>
       <div style="display: inline-block; float: right;">
-        <span style="vertical-align: middle; font-size: 12px;">{{ humanReadableDataSize(file.size) }}</span>
+        <span style="vertical-align: middle; font-size: 12px; margin-left: 10px;">{{ humanReadableDataSize(file.size) }}</span>
       </div>
     </el-row>
     <div style="margin: 10px 0px" class="el-divider el-divider--horizontal"></div>
