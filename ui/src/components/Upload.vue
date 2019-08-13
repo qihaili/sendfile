@@ -15,7 +15,7 @@
           style="text-align: left;"
           >
           <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button>
-          <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 20px">上传</el-button>
+          <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button>
           <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
         </el-upload>
       </div>
@@ -116,7 +116,7 @@ export default {
         fd.append('file', file.raw)
       }
       axios.post(
-        '/api/files/upload',
+        '/api/shares',
         fd,
         {
           onUploadProgress: this.showProgress
@@ -130,32 +130,6 @@ export default {
     },
     onChange(file, fileList) {
       this.fileList = fileList
-    },
-    uploadFile(file) {
-      console.log(file)
-      var fd = new FormData()
-      fd.append('file', file.file)
-      console.log(this.share.files.length)
-      axios.post(
-        `/api/shares/${this.share.id}`,
-        fd
-      ).then((response) => {
-        console.log('success', response)
-        this.share = response.data
-        if(this.share.files.length == 1) {
-          this.uploadedList.unshift(this.share)
-        } else {
-          for(var i=0; i<this.uploadedList.length; i++) {
-            if(this.uploadedList[i].id == this.share.id) {
-              // this.uploadedList[i] = this.share
-              this.uploadedList.splice(i, 1, this.share)
-              break
-            }
-          }
-        }
-        file.onSuccess()
-        return true
-      })
     },
     handleSuccess(response) {
       this.$message.success('上传成功')
@@ -249,6 +223,7 @@ export default {
 </script>
 <style>
 .mycard {
+  max-width: 400px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;

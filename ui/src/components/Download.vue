@@ -49,7 +49,7 @@ export default {
     console.log(this.$route)
     const _this = this
     axios.get(
-      `/api/files/${this.$route.params.shareId}`
+      `/api/shares/${this.$route.params.shareId}`
     ).then(
       function (data) {
         _this.response = data.data
