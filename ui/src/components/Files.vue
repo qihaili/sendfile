@@ -3,16 +3,17 @@
     <el-row v-for="(file, index) in share.files" :key="index">
       <div style="display: inline-block; float: left;">
         <!-- <el-link :href="'/api/files/' + share.id + '/' + file.name" :underline="false" style="vertical-align: middle; font-size: 16px;" icon="el-icon-document"><p style="width: 280px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px;">{{ file.name }}</p></el-link> -->
-        <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: 14px; margin: 0px;" icon="el-icon-document"><div style="max-width: 250px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link></el-tooltip>
+        <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: medium; margin: 0px;" icon="el-icon-document"><div style="max-width: 270px; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link></el-tooltip>
       </div>
       <div style="display: inline-block; float: right;">
-        <span style="vertical-align: middle; font-size: 12px; margin-left: 10px;">{{ humanReadableDataSize(file.size) }}</span>
+        <span style="vertical-align: middle; font-size: x-small; margin-left: 10px;">{{ humanReadableDataSize(file.size) }}</span>
       </div>
     </el-row>
     <div style="margin: 10px 0px" class="el-divider el-divider--horizontal"></div>
     <el-row>
-      <div style="display: inline-block; float: left;">
-        <span style="vertical-align: middle; font-size: 12px;" v-if="share.ttl">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span>
+      <div style="display: inline-block; float: left; text-align: left;">
+        <el-row><span style="vertical-align: middle; font-size: xx-small;" v-if="share.lastModified">上传于 {{ new Date(share.lastModified).toLocaleString() }}</span></el-row>
+        <el-row><span style="vertical-align: middle; font-size: xx-small;" v-if="share.ttl">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span></el-row>
       </div>
       <div style="display: inline-block; float: right;">
         <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>

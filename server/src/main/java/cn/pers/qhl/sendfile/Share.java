@@ -10,6 +10,8 @@ public class Share {
 
     private String token;
 
+    private Long lastModified;
+
     private List<ShareFile> files;
 
     public String getId() {
@@ -34,6 +36,14 @@ public class Share {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Long lastModified) {
+        this.lastModified = lastModified;
     }
 
     public List<ShareFile> getFiles() {

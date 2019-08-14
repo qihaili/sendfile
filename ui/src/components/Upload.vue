@@ -22,16 +22,16 @@
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus"/>
         <div style="height: 20px; line-height: 20px">
-          <span style="font-size: 14px">{{ speed }}</span>
+          <span style="font-size: x-small">{{ speed }}</span>
         </div>
         <div v-if="share" style="text-align: left;">
-          <span style="font-size: 14px" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
+          <span style="font-size: x-small" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
           <div style="margin: 20px 5px">
             <el-row>下载链接：</el-row>
             <el-input :value="address" style="min-width: 350px;">
               <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制链接</el-button>
             </el-input>
-            <el-row style="font-size: 12px"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
+            <el-row style="font-size: xx-small"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
           </div>
           <div style="text-align: center;">
             <el-link type="primary" @click="backToHome">再次上传</el-link>
@@ -223,7 +223,7 @@ export default {
 </script>
 <style>
 .mycard {
-  max-width: 400px;
+  max-width: 440px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;

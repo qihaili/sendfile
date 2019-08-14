@@ -43,6 +43,7 @@ public class ShareService {
             share.setTtl(ttl);
             share.setFiles(files);
             share.setToken(shareInfo.getToken());
+            share.setLastModified(shareDir.lastModified());
 
             return share;
         } catch (IOException e) {
