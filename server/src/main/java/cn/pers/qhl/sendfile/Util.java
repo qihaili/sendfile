@@ -2,29 +2,11 @@ package cn.pers.qhl.sendfile;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
-import java.io.File;
-
 public class Util {
 
     public static String REPO_ROOT = "./repo";
-
-    public static File getShareDir(String shareId) {
-        File shareDir = new File(REPO_ROOT, shareId);
-        if (!shareDir.exists()) {
-            throw new NotFoundException("未找到共享（" + shareId + "）");
-        } else {
-            return shareDir;
-        }
-    }
-
-    public static File createShareDir() {
-//        String shareId = UUID.randomUUID().toString();
-        String shareId = genId();
-        File shareDir = new File(REPO_ROOT, shareId);
-        shareDir.mkdirs();
-        return shareDir;
-    }
-
+    public static String SHARE_INFO_FILE = "share_info.json";
+    public static String FILES_DIR = "files";
 
     private static volatile long lastTime;
 

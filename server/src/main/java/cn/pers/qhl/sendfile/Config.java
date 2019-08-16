@@ -1,8 +1,5 @@
 package cn.pers.qhl.sendfile;
 
-import cn.pers.qhl.sendfile.config.SendFileConfig;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
