@@ -1,12 +1,13 @@
 <template>
   <div>
-    <el-card class="mycard">
+    <el-card class="mycard" style="width: 400px;">
       <!-- <div slot="header">
         上传文件
       </div> -->
       <div v-if="!isChooseUpload">
         <el-upload
           ref="upload"
+          drag
           action=""
           :show-file-list="true"
           :auto-upload="false"
@@ -14,10 +15,13 @@
           :on-change="onChange"
           style="text-align: left;"
           >
-          <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button>
-          <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button>
+          <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
           <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
         </el-upload>
+        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="width: 100%; margin: 20px 0px 0px 0px; bottom: 0px;">上传</el-button>
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus"/>
@@ -59,13 +63,15 @@
         <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
       </el-upload>
     </el-card> -->
-    <el-collapse-transition>
-      <el-card class="mycard" v-if="uploadedList.length > 0">
-        <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
-          <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
-        </el-card>
+    <transition>
+      <el-card class="mycard" v-if="uploadedList.length > 0" style="width: 440px;">
+        <transition-group name="list">
+          <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
+            <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
+          </el-card>
+        </transition-group>
       </el-card>
-    </el-collapse-transition>
+    </transition>
   </div>
 </template>
 
@@ -223,11 +229,16 @@ export default {
 </script>
 <style>
 .mycard {
-  max-width: 440px;
+  /* max-width: 440px; */
+  min-height: 350px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;
   display: inline-block;
   vertical-align: top;
+}
+.list-enter, .list-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
 }
 </style>
