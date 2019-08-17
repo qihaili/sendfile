@@ -13,15 +13,15 @@
           :auto-upload="false"
           :multiple="true"
           :on-change="onChange"
-          style="text-align: left;"
+          style="text-align: left; min-height: 310px;"
           >
           <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击添加文件</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
           <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
         </el-upload>
-        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="width: 100%; margin: 20px 0px 0px 0px; bottom: 0px;">上传</el-button>
+        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="width: 100%; margin: 15px 0px 0px 0px; bottom: 0px;">上传</el-button>
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus"/>
@@ -78,8 +78,6 @@
 <script>
 import axios from 'axios'
 import files from './Files'
-import { setTimeout } from 'timers';
-import { format } from 'path';
 export default {
   components: {
     files
@@ -130,7 +128,6 @@ export default {
       ).then((response) => {
         this.handleSuccess(response.data)
       }).catch((error) => {
-        console.log(error)
       })
       this.isChooseUpload = true
     },
@@ -230,7 +227,7 @@ export default {
 <style>
 .mycard {
   /* max-width: 440px; */
-  min-height: 350px;
+  min-height: 405px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;

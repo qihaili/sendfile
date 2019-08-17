@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card style="width: 400px; height: 400px; display: inline-block;">
+    <el-card style="width: 400px; height: 400px; display: inline-block; margin: 10px;">
       <div slot="header">
         文件（点击文件名下载）
       </div>
