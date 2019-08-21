@@ -41,6 +41,8 @@ public class Util {
                 unit = ChronoUnit.DAYS;
             } else if (ttl.endsWith("H")) {
                 unit = ChronoUnit.HOURS;
+            } else if (ttl.endsWith("m")) {
+                unit = ChronoUnit.MINUTES;
             } else {
                 throw new BadRequestException("无法识别单位：" + ttl);
             }

@@ -55,7 +55,7 @@ export default {
     clearInterval(this.syncSharePolling)
   },
   methods: {
-    onCopySuccess(e) {
+    onCopySuccess() {
       this.$message.success('地址已复制')
     },
     syncShare() {
@@ -93,9 +93,9 @@ export default {
               token: this.share.token
             }
           }
-          ).then((response) => {
+          ).then(() => {
             this.onRemoved(this.share)
-          }).finally((response)=> {
+          }).finally(()=> {
             this.deleteLoading = false
           })
       }).catch(() => {

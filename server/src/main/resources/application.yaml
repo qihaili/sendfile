@@ -13,6 +13,8 @@ logging:
 sendfile:
   share:
     ttl-options:
+      - name: 1分钟
+        value: 1m
       - name: 1小时
         value: 1H
       - name: 6小时
@@ -22,6 +24,8 @@ sendfile:
         default-option: true
       - name: 1星期
         value: 1W
+      - name: 1个月
+        value: 1M
       - name: 永不过期
         value: -1
     scan-interval: 1  # 单位：小时

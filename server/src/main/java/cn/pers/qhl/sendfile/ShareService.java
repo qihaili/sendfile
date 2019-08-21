@@ -28,6 +28,13 @@ public class ShareService {
         try {
             ShareInfo shareInfo = objectMapper.readValue(new File(shareDir, Util.SHARE_INFO_FILE), ShareInfo.class);
 
+            Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
+
+            if (ttl != null && ttl <= 0) {
+                deleteShareDir(shareId);
+                throw new NotFoundException("未找到共享（" + shareId + "）");
+            }
+
             ArrayList<ShareFile> files = new ArrayList<>();
             File filesDir = new File(shareDir, Util.FILES_DIR);
             for (File file : filesDir.listFiles()) {
@@ -38,7 +45,6 @@ public class ShareService {
             }
 
 //            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
-            Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
 
             Share share = new Share();
             share.setId(shareId);
