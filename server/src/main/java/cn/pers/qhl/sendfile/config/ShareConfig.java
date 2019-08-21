@@ -2,18 +2,18 @@ package cn.pers.qhl.sendfile.config;
 
 public class ShareConfig {
 
-    private Double ttl;
+    private TtlOption[] ttlOptions;
 
     private Double scanInterval;
 
     private Double maxFileSize;
 
-    public Double getTtl() {
-        return ttl;
+    public TtlOption[] getTtlOptions() {
+        return ttlOptions;
     }
 
-    public void setTtl(Double ttl) {
-        this.ttl = ttl;
+    public void setTtlOptions(TtlOption[] ttlOptions) {
+        this.ttlOptions = ttlOptions;
     }
 
     public Double getScanInterval() {

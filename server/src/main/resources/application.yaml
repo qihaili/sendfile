@@ -12,6 +12,17 @@ logging:
     cn.pers.qhl.sendfile.*: DEBUG
 sendfile:
   share:
-    ttl: 1  # 单位：天
+    ttl-options:
+      - name: 1小时
+        value: 1H
+      - name: 6小时
+        value: 6H
+      - name: 1天
+        value: 1D
+        default-option: true
+      - name: 1星期
+        value: 1W
+      - name: 永不过期
+        value: -1
     scan-interval: 1  # 单位：小时
     max-file-size: -1 # 单位：MB

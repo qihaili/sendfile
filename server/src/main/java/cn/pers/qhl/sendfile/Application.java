@@ -1,6 +1,7 @@
 package cn.pers.qhl.sendfile;
 
 import cn.pers.qhl.sendfile.config.SendFileConfig;
+import cn.pers.qhl.sendfile.config.TtlOption;
 import com.google.common.base.Predicates;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,9 @@ public class Application implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        logger.debug("过期时间：" + config.getShare().getTtl() + "天");
+        for (TtlOption ttl : config.getShare().getTtlOptions()) {
+            logger.debug(ttl.toString());
+        }
         logger.debug("扫描间隔：" + config.getShare().getScanInterval() + "小时");
         logger.debug("最大文件：" + config.getShare().getMaxFileSize() + " MB");
     }

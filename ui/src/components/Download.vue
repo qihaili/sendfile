@@ -9,7 +9,7 @@
             <p>正在读取文件...</p>
           </div>
           <div v-else>
-            <files :share="response" v-if="response" :on-removed="shareRemoved"></files>
+            <files :share="response" v-if="response"></files>
             <div v-else>
               <p>{{ errorMsg }}</p>
             </div>
@@ -37,16 +37,11 @@ export default {
     }
   },
   methods: {
-    shareRemoved(share) {
-      this.errorMsg = '文件已过期'
-      this.response = null
-    },
     gotoUpload() {
       this.$router.push('/')
     }
   },
   created() {
-    console.log(this.$route)
     const _this = this
     axios.get(
       `/api/shares/${this.$route.params.shareId}`

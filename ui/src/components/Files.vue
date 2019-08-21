@@ -13,7 +13,7 @@
     <el-row>
       <div style="display: inline-block; float: left; text-align: left;">
         <!-- <el-row><span style="vertical-align: middle; font-size: xx-small;" v-if="share.lastModified">上传于 {{ new Date(share.lastModified).toLocaleString() }}</span></el-row> -->
-        <el-row><span style="vertical-align: middle; font-size: xx-small;" v-if="share.ttl">文件将于 {{ humanreadableDuration(share.ttl) }} 过期</span></el-row>
+        <el-row><span style="vertical-align: middle; font-size: xx-small;">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span></el-row>
       </div>
       <div style="display: inline-block; float: right;">
         <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
@@ -59,20 +59,23 @@ export default {
       this.$message.success('地址已复制')
     },
     syncShare() {
-      var _this = this
-      clearInterval(this.countdown)
+      if (this.countdown) {
+        clearInterval(this.countdown)
+      }
       axios.get(
           `/api/shares/${this.share.id}`
-        ).then(function(response) {
-          _this.share.ttl = response.data.ttl
-          _this.share.files = response.data.files
+        ).then((response) => {
+          this.share.ttl = response.data.ttl
+          this.share.files = response.data.files
           // _this.share = response.data
-          _this.countdown = setInterval(_this.refreshTtl, 10000)
-        }).catch (function (err) {
+          if (this.share.ttl) {
+            this.countdown = setInterval(this.refreshTtl, 10000)
+          }
+        }).catch ((err) => {
           if (err.response.status == 404) {
-            _this.onRemoved(_this.share)
+            this.onRemoved(this.share)
           } else {
-            _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
+            this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
           }
         })
     },
@@ -113,31 +116,6 @@ export default {
         humanReadable = (size / 1024).toFixed(1) + 'KB'
       } else {
         humanReadable = size.toFixed(0) + 'Bytes'
-      }
-      return humanReadable
-    },
-    humanreadableDuration(duration) {
-      var humanReadable = ''
-      if (duration > (1000 * 60 * 60 * 24)) {
-        humanReadable += parseInt(duration / (1000 * 60 * 60 * 24)) + '天'
-        duration = duration % (1000 * 60 * 60 * 24)
-      }
-      if (duration > (1000 * 60 * 60)) {
-        humanReadable += parseInt(duration / (1000 * 60 * 60)) + '小时'
-        duration = duration % (1000 * 60 * 60)
-      }
-      if (duration > (1000 * 60)) {
-        humanReadable += parseInt(duration / (1000 * 60)) + '分钟'
-        // duration = duration % (1000 * 60)
-      }
-      // if (duration > 1000) {
-      //   humanReadable += parseInt(duration / 1000) + '秒'
-      //   duration = duration % 1000
-      // }
-      if (humanReadable == '') {
-        humanReadable = '1分钟内'
-      } else {
-        humanReadable += '后'
       }
       return humanReadable
     }

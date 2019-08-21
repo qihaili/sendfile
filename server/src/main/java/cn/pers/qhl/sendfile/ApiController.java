@@ -1,5 +1,7 @@
 package cn.pers.qhl.sendfile;
 
+import cn.pers.qhl.sendfile.config.SendFileConfig;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,10 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiController {
 
     @Autowired
-    private Config config;
+    private SendFileConfig shareFileConfig;
 
     @GetMapping("config")
-    Config getConfig() {
-        return config;
+    SendFileConfig getConfig() {
+        SendFileConfig result = new SendFileConfig();
+        BeanUtils.copyProperties(shareFileConfig, result);
+        return result;
     }
 }

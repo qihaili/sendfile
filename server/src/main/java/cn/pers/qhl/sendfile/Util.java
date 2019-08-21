@@ -1,6 +1,10 @@
 package cn.pers.qhl.sendfile;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 public class Util {
 
@@ -23,5 +27,27 @@ public class Util {
     public static String genToken() {
 //        return RandomStringUtils.random(32, "abcdefghijkmnpqrstuvwxyz23456789");
         return RandomStringUtils.randomAlphanumeric(32);
+    }
+
+    public static Long parseTtlToMillis(String ttl) {
+        ttl = ttl.trim();
+        if (Character.isLetter(ttl.charAt(ttl.length() - 1))) {
+            ChronoUnit unit;
+            if (ttl.endsWith("Y")) {
+                unit = ChronoUnit.YEARS;
+            } else if (ttl.endsWith("M")) {
+                unit = ChronoUnit.MONTHS;
+            } else if (ttl.endsWith("D")) {
+                unit = ChronoUnit.DAYS;
+            } else if (ttl.endsWith("H")) {
+                unit = ChronoUnit.HOURS;
+            } else {
+                throw new BadRequestException("无法识别单位：" + ttl);
+            }
+            Long amount = Long.parseLong(ttl.substring(0, ttl.length()-1).trim());
+            return Duration.of(amount, unit).toMillis();
+        } else {
+            return Long.parseLong(ttl);
+        }
     }
 }

@@ -4,7 +4,7 @@
       <!-- <div slot="header">
         上传文件
       </div> -->
-      <div v-if="!isChooseUpload">
+      <div v-if="!isChooseUpload" style="text-align: left;">
         <el-upload
           ref="upload"
           drag
@@ -19,17 +19,26 @@
           <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击添加文件</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
-          <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
+          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config">可上传<span v-if="config.share.maxFileSize > 0">{{this.config.share.maxFileSize}}MB</span><span v-else>任意大小</span>的文件</div>
         </el-upload>
-        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="width: 100%; margin: 15px 0px 0px 0px; bottom: 0px;">上传</el-button>
+        <el-select v-if="config" v-model="ttl" :disabled="fileList === null || fileList.length == 0" placeholder="请选择" size="small" style="width: 100px; margin-top: 15px;">
+          <el-option
+            v-for="(item, index) in config.share.ttlOptions"
+            :key="index"
+            :label="item.name"
+            :value="item.value">
+          </el-option>
+        </el-select>
+        <span style="margin-left: 10px; font-size: small; color: #606266;">后过期</span>
+        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 15px;">上传</el-button>
       </div>
       <div v-else>
-        <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus"/>
+        <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus" style="margin-top: 20px;"/>
         <div style="height: 20px; line-height: 20px">
           <span style="font-size: x-small">{{ speed }}</span>
         </div>
         <div v-if="share" style="text-align: left;">
-          <span style="font-size: x-small" v-if="shareTTL">文件将在{{shareTTL}}天后过期</span>
+          <span style="font-size: x-small" v-if="config">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span>
           <div style="margin: 20px 5px">
             <el-row>下载链接：</el-row>
             <el-input :value="address" style="min-width: 350px;">
@@ -91,8 +100,8 @@ export default {
       speed: null,
       lastLoaded: 0,
       lastLoadTime: null,
-      shareTTL: null,
-      maxFileSize: null,
+      config: null,
+      ttl: null,
       uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded')),
       fileList: null
     }
@@ -103,19 +112,29 @@ export default {
     }
   },
   created() {
-    var _this = this
+    var loading = this.$loading()
     axios.get('/api/config')
-    .then(function(data) {
-      _this.shareTTL = data.data.shareTTL
-      _this.maxFileSize = data.data.maxFileSize
-    }).catch(function(err) {
-      _this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
+    .then((data) => {
+      this.config = data.data
+      for(var option of this.config.share.ttlOptions) {
+        if(option.defaultOption) {
+          this.ttl = option.value
+        }
+      }
+      if(!this.ttl) {
+        this.ttl = this.config.share.ttlOptions[0].value
+      }
+    }).catch((err) => {
+      this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
+    }).finally(() => {
+      loading.close()
     })
     // setInterval(this.syncUploadedShareList, 3000);
   },
   methods: {
     submitUpload() {
       var fd = new FormData()
+      fd.append('ttl', this.ttl)
       for(var file of this.fileList) {
         fd.append('file', file.raw)
       }
@@ -128,6 +147,7 @@ export default {
       ).then((response) => {
         this.handleSuccess(response.data)
       }).catch((error) => {
+        this.handleError(error)
       })
       this.isChooseUpload = true
     },
@@ -146,6 +166,7 @@ export default {
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(err) {
+      console.log(err)
       var response = JSON.parse(err.message)
 
       this.$message.error('上传失败。' + response.message)

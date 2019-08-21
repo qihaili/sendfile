@@ -26,7 +26,7 @@ public class ShareService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            Share shareInfo = objectMapper.readValue(new File(shareDir, Util.SHARE_INFO_FILE), Share.class);
+            ShareInfo shareInfo = objectMapper.readValue(new File(shareDir, Util.SHARE_INFO_FILE), ShareInfo.class);
 
             ArrayList<ShareFile> files = new ArrayList<>();
             File filesDir = new File(shareDir, Util.FILES_DIR);
@@ -37,7 +37,8 @@ public class ShareService {
                 files.add(shareFile);
             }
 
-            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+//            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
+            Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
 
             Share share = new Share();
             share.setId(shareId);
@@ -68,7 +69,7 @@ public class ShareService {
         }
     }
 
-    synchronized public CreateShareResult createShareDir() throws IOException {
+    synchronized public CreateShareResult createShareDir() {
         while (true) {
             // id为当前时间毫秒数的36进制表示
             String id = Util.genId();
@@ -80,14 +81,6 @@ public class ShareService {
             if (!shareDir.exists()) {
                 File filesDir = new File(shareDir, Util.FILES_DIR);
                 filesDir.mkdirs();
-
-                String token = Util.genToken();
-                ShareInfo shareInfo = new ShareInfo();
-                shareInfo.setToken(token);
-
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.writeValue(new File(shareDir, Util.SHARE_INFO_FILE), shareInfo);
-
                 return new CreateShareResult(id, shareDir);
             }
         }
@@ -116,6 +109,9 @@ public class ShareService {
     synchronized public List<Share> getAllShares() {
         ArrayList<Share> shares = new ArrayList<>();
         File repo = new File(Util.REPO_ROOT);
+        if (!repo.exists()) {
+            repo.mkdirs();
+        }
         for (String lv1Id : repo.list()) {
             File lv1Dir = new File(repo, lv1Id);
             for (String lv2Id : lv1Dir.list()) {

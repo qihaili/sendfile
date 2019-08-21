@@ -1,6 +1,7 @@
 package cn.pers.qhl.sendfile;
 
 import cn.pers.qhl.sendfile.config.SendFileConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,23 +29,26 @@ public class ShareController {
     private ShareService shareService;
 
     @PostMapping
-    Share upload(@RequestPart("file") MultipartFile[] files) {
-//        String shareId = Util.genId();
-//        File shareDir = new File(Util.REPO_ROOT, shareId);
-//        shareDir.mkdirs();
-
+    Share upload(@RequestPart("ttl") String ttl, @RequestPart("file") MultipartFile[] files) {
         try {
             ShareService.CreateShareResult result = shareService.createShareDir();
             File shareDir = result.dir;
             String shareId = result.id;
             File filesDir = new File(shareDir, Util.FILES_DIR);
 
+            String token = Util.genToken();
+            ShareInfo shareInfo = new ShareInfo();
+            shareInfo.setToken(token);
+            shareInfo.setTtlConfig(Util.parseTtlToMillis(ttl));
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(new File(shareDir, Util.SHARE_INFO_FILE), shareInfo);
+
             for (MultipartFile file : files) {
                 if (config.getShare().getMaxFileSize() > 0 && file.getSize() > config.getShare().getMaxFileSize().longValue() * 1024 * 1024) {
                     throw new BadRequestException("文件过大");
                 }
                 File destFile = new File(filesDir, file.getOriginalFilename());
-
                 file.transferTo(destFile.getCanonicalFile());
             }
 

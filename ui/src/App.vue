@@ -15,11 +15,7 @@ import HelloWorld from './components/HelloWorld.vue'
 import Upload from './components/Upload.vue'
 
 export default {
-  name: 'app',
-  components: {
-    HelloWorld,
-    Upload
-  }
+  name: 'app'
 }
 </script>
 
