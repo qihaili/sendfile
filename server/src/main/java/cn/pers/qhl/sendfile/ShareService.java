@@ -21,7 +21,7 @@ public class ShareService {
     @Autowired
     private SendFileConfig config;
 
-    synchronized public Share getShare(String shareId) throws IOException {
+    synchronized public ShareInfo getShare(String shareId) throws IOException {
         File shareDir = getShareDir(shareId);
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -31,6 +31,7 @@ public class ShareService {
             Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
 
             if (ttl != null && ttl <= 0) {
+                logger.debug("删除共享" + shareId + "，已过期");
                 deleteShareDir(shareId);
                 throw new NotFoundException("未找到共享（" + shareId + "）");
             }
@@ -46,14 +47,14 @@ public class ShareService {
 
 //            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
 
-            Share share = new Share();
-            share.setId(shareId);
-            share.setTtl(ttl);
-            share.setFiles(files);
-            share.setToken(shareInfo.getToken());
-            share.setLastModified(shareDir.lastModified());
+//            Share share = new Share();
+        shareInfo.setId(shareId);
+        shareInfo.setTtl(ttl);
+        shareInfo.setFiles(files);
+//            share.setToken(shareInfo.getToken());
+        shareInfo.setLastModified(shareDir.lastModified());
 
-            return share;
+            return shareInfo;
 //        } catch (IOException e) {
 //            logger.error(e.getMessage(), e);
 //            throw new ServerException(e);
@@ -112,8 +113,8 @@ public class ShareService {
         }
     }
 
-    synchronized public List<Share> getAllShares() {
-        ArrayList<Share> shares = new ArrayList<>();
+    synchronized public List<ShareInfo> getAllShares() {
+        ArrayList<ShareInfo> shares = new ArrayList<>();
         File repo = new File(Util.REPO_ROOT);
         if (!repo.exists()) {
             repo.mkdirs();
@@ -123,8 +124,8 @@ public class ShareService {
             for (String lv2Id : lv1Dir.list()) {
                 String shareId = lv1Id + lv2Id;
                 try {
-                    Share share = getShare(shareId);
-                    shares.add(share);
+                    ShareInfo shareInfo = getShare(shareId);
+                    shares.add(shareInfo);
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }

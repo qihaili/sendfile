@@ -4,6 +4,7 @@ import cn.pers.qhl.sendfile.config.SendFileConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ public class ShareController {
     private ShareService shareService;
 
     @PostMapping
-    Share upload(@RequestPart("ttl") String ttl, @RequestPart("file") MultipartFile[] files) {
+    ShareWithToken upload(@RequestPart("ttl") String ttl, @RequestPart("file") MultipartFile[] files) {
         try {
             ShareService.CreateShareResult result = shareService.createShareDir();
             File shareDir = result.dir;
@@ -52,7 +53,11 @@ public class ShareController {
                 file.transferTo(destFile.getCanonicalFile());
             }
 
-            return shareService.getShare(shareId);
+            ShareInfo shareInfo1 = shareService.getShare(shareId);
+            ShareWithToken shareWithToken = new ShareWithToken();
+            BeanUtils.copyProperties(shareInfo1, shareWithToken);
+
+            return shareWithToken;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new ServerException(e);
@@ -76,11 +81,16 @@ public class ShareController {
     }
 
     @GetMapping("{shareId}")
-    Share get(@PathVariable String shareId) {
+    Share get(@PathVariable String shareId, @RequestHeader(required = false) String token, @RequestHeader(required = false) String password) {
         try {
-            Share share = shareService.getShare(shareId);
-            share.setToken(null);
-            return share;
+            ShareInfo shareInfo = shareService.getShare(shareId);
+            if (shareInfo.getPassword() == null || shareInfo.getToken().equals(token) || shareInfo.getPassword().equals(password)) {
+                Share share = new Share();
+                BeanUtils.copyProperties(shareInfo, share);
+                return share;
+            } else {
+                throw new UnauthorizedException();
+            }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new ServerException(e);
@@ -90,8 +100,8 @@ public class ShareController {
     @DeleteMapping("{shareId}")
     void delete(@PathVariable String shareId, @RequestHeader String token) {
         try {
-            Share share = shareService.getShare(shareId);
-            if (share.getToken().equals(token)) {
+            ShareInfo shareInfo = shareService.getShare(shareId);
+            if (shareInfo.getToken().equals(token)) {
                 shareService.deleteShareDir(shareId);
             } else {
                 throw new UnauthorizedException();

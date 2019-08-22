@@ -28,8 +28,8 @@ public class ScheduledJob implements SchedulingConfigurer {
         logger.debug("注册扫描定时任务");
         scheduledTaskRegistrar.addFixedRateTask(() -> {
             logger.debug("检测过期的共享");
-            List<Share> shares = shareService.getAllShares();
-            for (Share share : shares) {
+            List<ShareInfo> shares = shareService.getAllShares();
+            for (ShareInfo share : shares) {
                 Long ttl = share.getTtl();
                 if (ttl != null && ttl < 0) {
                     logger.debug("删除share: " + share.getId());

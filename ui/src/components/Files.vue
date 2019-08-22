@@ -17,7 +17,7 @@
       </div>
       <div style="display: inline-block; float: right;">
         <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
-        <el-tooltip content="删除文件" placement="top" v-if="deletable"><el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteShare" :loading="deleteLoading"></el-button></el-tooltip>
+        <el-tooltip content="删除文件" placement="top" v-if="share.token"><el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteShare" :loading="deleteLoading"></el-button></el-tooltip>
       </div>
     </el-row>
   </div>
@@ -29,10 +29,6 @@ export default {
   props: {
     share: {
       type: Object,
-    },
-    deletable: {
-      type: Boolean,
-      default: false
     },
     onRemoved: {
       type: Function,

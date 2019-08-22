@@ -8,10 +8,6 @@ public class Share {
 
     private Long ttl;
 
-    private String token;
-
-    private Long lastModified;
-
     private List<ShareFile> files;
 
     public String getId() {
@@ -28,22 +24,6 @@ public class Share {
 
     public void setTtl(Long ttl) {
         this.ttl = ttl;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Long getLastModified() {
-        return lastModified;
-    }
-
-    public void setLastModified(Long lastModified) {
-        this.lastModified = lastModified;
     }
 
     public List<ShareFile> getFiles() {

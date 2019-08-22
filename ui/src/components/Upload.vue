@@ -55,28 +55,11 @@
         </div>
       </div>
     </el-card>
-    <!-- <el-card class="mycard" v-if="isChooseUpload">
-      <el-upload
-        ref="upload"
-        :action="uploadUrl"
-        :show-file-list="true"
-        :auto-upload="false"
-        :multiple="true"
-        :on-success="handleSuccess"
-        :on-error="handleError"
-        :on-progress="showProgress"
-        style="text-align: left"
-        >
-        <el-button slot="trigger" type="primary">选择文件</el-button>
-        <el-button type="success" icon="el-icon-upload" @click="submitUpload" style="margin-left: 10px;">开始上传</el-button>
-        <div class="el-upload__tip" slot="tip">可上传<span v-if="maxFileSize > 0">{{this.maxFileSize}}MB</span><span v-else>任意大小</span>的文件。<span v-if="shareTTL > 0">有效期{{this.shareTTL}}天</span><span v-else>永久有效</span></div>
-      </el-upload>
-    </el-card> -->
     <transition>
       <el-card class="mycard" v-if="uploadedList.length > 0" style="width: 440px;">
         <transition-group name="list">
           <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
-            <files :share="uploadedShare" :on-removed="shareRemoved" :deletable="true"></files>
+            <files :share="uploadedShare" :on-removed="shareRemoved"></files>
           </el-card>
         </transition-group>
       </el-card>
@@ -155,6 +138,7 @@ export default {
       this.fileList = fileList
     },
     handleSuccess(response) {
+      console.log(response)
       this.$message.success('上传成功')
       this.isSuccess = true
       this.share = response
@@ -248,7 +232,7 @@ export default {
 <style>
 .mycard {
   /* max-width: 440px; */
-  min-height: 405px;
+  min-height: 460px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;
