@@ -166,7 +166,7 @@ export default {
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(err) {
-      console.log(err)
+      // console.log(err)
       var response = JSON.parse(err.message)
 
       this.$message.error('上传失败。' + response.message)

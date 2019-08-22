@@ -77,18 +77,28 @@ public class ShareController {
 
     @GetMapping("{shareId}")
     Share get(@PathVariable String shareId) {
-        Share share = shareService.getShare(shareId);
-        share.setToken(null);
-        return share;
+        try {
+            Share share = shareService.getShare(shareId);
+            share.setToken(null);
+            return share;
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new ServerException(e);
+        }
     }
 
     @DeleteMapping("{shareId}")
     void delete(@PathVariable String shareId, @RequestHeader String token) {
-        Share share = shareService.getShare(shareId);
-        if (share.getToken().equals(token)) {
-            shareService.deleteShareDir(shareId);
-        } else {
-            throw new UnauthorizedException();
+        try {
+            Share share = shareService.getShare(shareId);
+            if (share.getToken().equals(token)) {
+                shareService.deleteShareDir(shareId);
+            } else {
+                throw new UnauthorizedException();
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new ServerException(e);
         }
     }
 

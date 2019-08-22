@@ -21,11 +21,11 @@ public class ShareService {
     @Autowired
     private SendFileConfig config;
 
-    synchronized public Share getShare(String shareId) {
+    synchronized public Share getShare(String shareId) throws IOException {
         File shareDir = getShareDir(shareId);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        try {
+//        try {
             ShareInfo shareInfo = objectMapper.readValue(new File(shareDir, Util.SHARE_INFO_FILE), ShareInfo.class);
 
             Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
@@ -54,10 +54,10 @@ public class ShareService {
             share.setLastModified(shareDir.lastModified());
 
             return share;
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new ServerException(e);
-        }
+//        } catch (IOException e) {
+//            logger.error(e.getMessage(), e);
+//            throw new ServerException(e);
+//        }
     }
 
     synchronized public File getShareDir(String shareId) {
@@ -122,8 +122,12 @@ public class ShareService {
             File lv1Dir = new File(repo, lv1Id);
             for (String lv2Id : lv1Dir.list()) {
                 String shareId = lv1Id + lv2Id;
-                Share share = getShare(shareId);
-                shares.add(share);
+                try {
+                    Share share = getShare(shareId);
+                    shares.add(share);
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
         return shares;

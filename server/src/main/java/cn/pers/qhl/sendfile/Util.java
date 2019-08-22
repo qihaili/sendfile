@@ -31,20 +31,17 @@ public class Util {
 
     public static Long parseTtlToMillis(String ttl) {
         ttl = ttl.trim();
-        if (Character.isLetter(ttl.charAt(ttl.length() - 1))) {
+        char unitLetter = ttl.charAt(ttl.length() - 1);
+        if (Character.isLetter(unitLetter)) {
             ChronoUnit unit;
-            if (ttl.endsWith("Y")) {
-                unit = ChronoUnit.YEARS;
-            } else if (ttl.endsWith("M")) {
-                unit = ChronoUnit.MONTHS;
-            } else if (ttl.endsWith("D")) {
+            if (ttl.endsWith("D")) {
                 unit = ChronoUnit.DAYS;
             } else if (ttl.endsWith("H")) {
                 unit = ChronoUnit.HOURS;
-            } else if (ttl.endsWith("m")) {
+            } else if (ttl.endsWith("M")) {
                 unit = ChronoUnit.MINUTES;
             } else {
-                throw new BadRequestException("无法识别单位：" + ttl);
+                throw new BadRequestException("无法识别单位：" + unitLetter);
             }
             Long amount = Long.parseLong(ttl.substring(0, ttl.length()-1).trim());
             return Duration.of(amount, unit).toMillis();

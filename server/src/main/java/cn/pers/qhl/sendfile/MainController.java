@@ -8,7 +8,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @ApiIgnore
 public class MainController {
 
-    @GetMapping("/ui")
+    @GetMapping({"/", "/ui"})
     public String home() {
         return "redirect:/ui/index.html";
     }
