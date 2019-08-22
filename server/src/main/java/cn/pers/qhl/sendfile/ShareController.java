@@ -30,7 +30,7 @@ public class ShareController {
     private ShareService shareService;
 
     @PostMapping
-    ShareWithToken upload(@RequestPart("ttl") String ttl, @RequestPart("file") MultipartFile[] files) {
+    ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files) {
         try {
             ShareService.CreateShareResult result = shareService.createShareDir();
             File shareDir = result.dir;
@@ -41,6 +41,7 @@ public class ShareController {
             ShareInfo shareInfo = new ShareInfo();
             shareInfo.setToken(token);
             shareInfo.setTtlConfig(Util.parseTtlToMillis(ttl));
+            shareInfo.setPassword(password);
 
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.writeValue(new File(shareDir, Util.SHARE_INFO_FILE), shareInfo);

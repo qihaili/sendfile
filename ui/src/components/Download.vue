@@ -9,7 +9,15 @@
             <p>正在读取文件...</p>
           </div>
           <div v-else>
-            <files :share="response" v-if="response"></files>
+            <files :share="response" v-if="response" :on-removed="shareRemoved"></files>
+            <div v-else-if="needPassword" style="margin-top: 40px;">
+              <span>文件已加密，请输入密码</span>
+              <el-row style="margin-top: 10px;">
+                <el-input size="small" v-model="password" style="width: 200px; margin-right: 10px;">
+                </el-input>
+                <el-button size="small" type="primary" @click="getShare">解锁</el-button>
+              </el-row>
+            </div>
             <div v-else>
               <p>{{ errorMsg }}</p>
             </div>
@@ -33,27 +41,43 @@ export default {
       // files: [],
       response: null,
       loading: true,
-      errorMsg: null
+      errorMsg: null,
+      needPassword: false,
+      password: null
     }
+  },
+  created() {
+    this.getShare()
   },
   methods: {
     gotoUpload() {
       this.$router.push('/')
+    },
+    getShare() {
+      axios.get(
+        `/api/shares/${this.$route.params.shareId}`, {
+          headers: {
+            password: this.password
+          }
+        }
+      ).then((data) => {
+          this.response = data.data
+          this.response.password = this.password
+      }).catch((error) => {
+        if (error.response.status == 401) {
+          this.needPassword = true
+        } else {
+          this.errorMsg = error.response.data.message
+        }
+      }).finally(() => {
+          this.loading = false;
+      })
+    },
+    shareRemoved(share) {
+      this.errorMsg = "文件已过期"
+      this.needPassword = false
+      this.response = null
     }
-  },
-  created() {
-    const _this = this
-    axios.get(
-      `/api/shares/${this.$route.params.shareId}`
-    ).then(
-      function (data) {
-        _this.response = data.data
-      }, function (err) {
-        _this.errorMsg = err.response.data.message
-      }
-    ).finally(function() {
-        _this.loading = false;
-    })
   }
 }
 </script>

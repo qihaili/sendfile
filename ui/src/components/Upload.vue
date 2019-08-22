@@ -21,16 +21,22 @@
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
           <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config">可上传<span v-if="config.share.maxFileSize > 0">{{this.config.share.maxFileSize}}MB</span><span v-else>任意大小</span>的文件</div>
         </el-upload>
-        <el-select v-if="config" v-model="ttl" :disabled="fileList === null || fileList.length == 0" placeholder="请选择" size="small" style="width: 100px; margin-top: 15px;">
-          <el-option
-            v-for="(item, index) in config.share.ttlOptions"
-            :key="index"
-            :label="item.name"
-            :value="item.value">
-          </el-option>
-        </el-select>
-        <span style="margin-left: 10px; font-size: small; color: #606266;">后过期</span>
-        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 15px;">上传</el-button>
+        <el-row style="margin-top: 10px;">
+          <el-select v-if="config" v-model="ttl" :disabled="fileList === null || fileList.length == 0" placeholder="请选择" size="mini" style="width: 100px;">
+            <el-option
+              v-for="(item, index) in config.share.ttlOptions"
+              :key="index"
+              :label="item.name"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <span style="margin-left: 10px; font-size: small; color: #606266;">后过期</span>
+        </el-row>
+        <el-row style="margin-top: 10px; line-height: 28px;">
+          <el-checkbox v-model="passwordEnabled">密码保护</el-checkbox>
+          <el-input style="width: 200px; margin-left: 10px;" size="mini" v-if="passwordEnabled" v-model="password"></el-input>
+        </el-row>
+        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus" style="margin-top: 20px;"/>
@@ -86,7 +92,9 @@ export default {
       config: null,
       ttl: null,
       uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded')),
-      fileList: null
+      fileList: null,
+      passwordEnabled: false,
+      password: null
     }
   },
   computed: {
@@ -118,6 +126,9 @@ export default {
     submitUpload() {
       var fd = new FormData()
       fd.append('ttl', this.ttl)
+      if(this.passwordEnabled && this.password) {
+        fd.append('password', this.password)
+      }
       for(var file of this.fileList) {
         fd.append('file', file.raw)
       }

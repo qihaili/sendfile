@@ -59,7 +59,12 @@ export default {
         clearInterval(this.countdown)
       }
       axios.get(
-          `/api/shares/${this.share.id}`
+        `/api/shares/${this.share.id}`, {
+          headers: {
+            token: this.share.token,
+            password: this.share.password
+          }
+        }
         ).then((response) => {
           this.share.ttl = response.data.ttl
           this.share.files = response.data.files
