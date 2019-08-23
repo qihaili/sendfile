@@ -25,7 +25,7 @@
           <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config">可上传<span v-if="config.share.maxFileSize > 0">{{this.config.share.maxFileSize}}MB</span><span v-else>任意大小</span>的文件</div>
         </el-upload>
         <el-row style="margin-top: 10px;">
-          <el-select v-if="config" v-model="ttl" :disabled="fileList === null || fileList.length == 0" placeholder="请选择" size="mini" style="width: 100px;">
+          <el-select v-if="config" v-model="ttl" placeholder="请选择" size="mini" style="width: 100px;">
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
               :key="index"
@@ -217,6 +217,8 @@ export default {
       this.uploadPercentage = 0
       this.share = null
       this.fileList = null
+      this.passwordEnabled = false
+      this.password = null
       // this.isChooseDownload = true
     },
     shareRemoved(share) {
