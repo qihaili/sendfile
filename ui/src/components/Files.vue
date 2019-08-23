@@ -72,7 +72,7 @@ export default {
             this.countdown = setInterval(this.refreshTtl, 10000)
           }
         }).catch ((error) => {
-          if (error.response.status == 404) {
+          if (error.response.data.status == 404) {
             this.onRemoved(this.share)
           } else {
             // this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
@@ -84,7 +84,6 @@ export default {
       this.share.ttl -= 10000
     },
     deleteShare() {
-      var _this = this
       this.deleteLoading = true
       this.$confirm('确定删除文件共享？', {
         type: 'warning'

@@ -59,7 +59,6 @@ export default {
       ).then(() => {
         this.getShare()
       }).catch((error) => {
-        console.log(error)
         if(error.response.data.status == 401) {
           this.$message.error('密码错误')
         } else {
@@ -77,7 +76,6 @@ export default {
         }
       ).then((data) => {
           this.share = data.data
-          this.share.password = this.password
           this.needPassword = false
       }).catch((error) => {
         if (error.response.data.status == 401) {
@@ -92,7 +90,7 @@ export default {
           loading.close()
       })
     },
-    shareRemoved(share) {
+    shareRemoved() {
       this.errorMsg = "文件已过期"
       this.needPassword = false
       this.share = null
