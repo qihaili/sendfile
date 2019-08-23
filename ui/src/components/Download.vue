@@ -13,8 +13,8 @@
             <span>文件已加密，请输入密码</span>
           </el-row>
           <el-row style="margin-top: 10px;">
-            <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="getShare" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
-            <el-button type="primary" @click="getShare">解锁</el-button>
+            <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
+            <el-button type="primary" @click="authorize">解锁</el-button>
           </el-row>
         </div>
         <div v-else style="min-height: 310px; width: 100%; display: table; text-align: center;">
@@ -50,23 +50,41 @@ export default {
     gotoUpload() {
       this.$router.push('/')
     },
+    authorize() {
+      axios.post(
+        `/api/shares/${this.$route.params.shareId}/authorize`,
+        {
+          password: this.password
+        }
+      ).then(() => {
+        this.getShare()
+      }).catch((error) => {
+        console.log(error)
+        if(error.response.data.status == 401) {
+          this.$message.error('密码错误')
+        } else {
+          this.$message.error(error.response.data.message ? error.response.data.message : error)
+        }
+      })
+    },
     getShare() {
       var loading = this.$loading()
       axios.get(
         `/api/shares/${this.$route.params.shareId}`, {
-          headers: {
-            password: this.password
-          }
+          // headers: {
+          //   password: this.password
+          // }
         }
       ).then((data) => {
           this.share = data.data
           this.share.password = this.password
+          this.needPassword = false
       }).catch((error) => {
-        if (error.response.status == 401) {
+        if (error.response.data.status == 401) {
           this.needPassword = true
-          if(this.password) {
-            this.$message.error('密码错误')
-          }
+          // if(this.password) {
+          //   this.$message.error('密码错误')
+          // }
         } else {
           this.errorMsg = error.response.data.message ? error.response.data.message : error
         }
