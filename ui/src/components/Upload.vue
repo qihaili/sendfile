@@ -155,7 +155,6 @@ export default {
       this.fileList = fileList
     },
     handleSuccess(response) {
-      console.log(response)
       this.$message.success('上传成功')
       this.isSuccess = true
       this.share = response

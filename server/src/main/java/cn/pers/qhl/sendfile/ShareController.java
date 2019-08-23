@@ -83,8 +83,8 @@ public class ShareController {
 
     @GetMapping("{shareId}")
     Share get(@PathVariable String shareId, @RequestHeader(required = false) String token, @RequestHeader(required = false) String password) {
-        try {
-            ShareInfo shareInfo = shareService.getShare(shareId);
+        ShareInfo shareInfo = shareService.getShare(shareId);
+        if (shareInfo != null) {
             if (shareInfo.getPassword() == null || shareInfo.getToken().equals(token) || shareInfo.getPassword().equals(password)) {
                 Share share = new Share();
                 BeanUtils.copyProperties(shareInfo, share);
@@ -92,24 +92,22 @@ public class ShareController {
             } else {
                 throw new UnauthorizedException();
             }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new ServerException(e);
+        } else {
+            throw new BadRequestException("未找到共享：" + shareId);
         }
     }
 
     @DeleteMapping("{shareId}")
     void delete(@PathVariable String shareId, @RequestHeader String token) {
-        try {
-            ShareInfo shareInfo = shareService.getShare(shareId);
+        ShareInfo shareInfo = shareService.getShare(shareId);
+        if (shareInfo != null) {
             if (shareInfo.getToken().equals(token)) {
                 shareService.deleteShareDir(shareId);
             } else {
                 throw new UnauthorizedException();
             }
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new ServerException(e);
+        } else {
+            throw new BadRequestException("未找到共享：" + shareId);
         }
     }
 

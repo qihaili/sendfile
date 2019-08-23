@@ -1,7 +1,6 @@
 package cn.pers.qhl.sendfile;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

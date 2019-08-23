@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.io.File;
 
 @Component
 @EnableScheduling
@@ -28,12 +28,16 @@ public class ScheduledJob implements SchedulingConfigurer {
         logger.debug("注册扫描定时任务");
         scheduledTaskRegistrar.addFixedRateTask(() -> {
             logger.debug("检测过期的共享");
-            List<ShareInfo> shares = shareService.getAllShares();
-            for (ShareInfo share : shares) {
-                Long ttl = share.getTtl();
-                if (ttl != null && ttl < 0) {
-                    logger.debug("删除share: " + share.getId());
-                    shareService.deleteShareDir(share.getId());
+
+            File repo = new File(Util.REPO_ROOT);
+            if (!repo.exists()) {
+                repo.mkdirs();
+            }
+            for (String lv1Id : repo.list()) {
+                File lv1Dir = new File(repo, lv1Id);
+                for (String lv2Id : lv1Dir.list()) {
+                    String shareId = lv1Id + lv2Id;
+                    shareService.getShare(shareId);
                 }
             }
         }, new Double(config.getShare().getScanInterval() * 60 * 60 * 1000).longValue());

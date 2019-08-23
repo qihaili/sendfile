@@ -11,7 +11,6 @@ import org.springframework.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ShareService {
@@ -21,11 +20,11 @@ public class ShareService {
     @Autowired
     private SendFileConfig config;
 
-    synchronized public ShareInfo getShare(String shareId) throws IOException {
+    synchronized public ShareInfo getShare(String shareId) {
         File shareDir = getShareDir(shareId);
 
         ObjectMapper objectMapper = new ObjectMapper();
-//        try {
+        try {
             ShareInfo shareInfo = objectMapper.readValue(new File(shareDir, Util.SHARE_INFO_FILE), ShareInfo.class);
 
             Long ttl = shareInfo.getTtlConfig() == -1 ? null : shareInfo.getTtlConfig() - (System.currentTimeMillis() - shareDir.lastModified());
@@ -33,32 +32,31 @@ public class ShareService {
             if (ttl != null && ttl <= 0) {
                 logger.debug("删除共享" + shareId + "，已过期");
                 deleteShareDir(shareId);
-                throw new NotFoundException("未找到共享（" + shareId + "）");
+                return null;
+//                throw new NotFoundException("未找到共享（" + shareId + "）");
+            } else {
+
+                ArrayList<ShareFile> files = new ArrayList<>();
+                File filesDir = new File(shareDir, Util.FILES_DIR);
+                for (File file : filesDir.listFiles()) {
+                    ShareFile shareFile = new ShareFile();
+                    shareFile.setName(file.getName());
+                    shareFile.setSize(file.length());
+                    files.add(shareFile);
+                }
+
+                shareInfo.setId(shareId);
+                shareInfo.setTtl(ttl);
+                shareInfo.setFiles(files);
+                shareInfo.setLastModified(shareDir.lastModified());
+
+                return shareInfo;
             }
-
-            ArrayList<ShareFile> files = new ArrayList<>();
-            File filesDir = new File(shareDir, Util.FILES_DIR);
-            for (File file : filesDir.listFiles()) {
-                ShareFile shareFile = new ShareFile();
-                shareFile.setName(file.getName());
-                shareFile.setSize(file.length());
-                files.add(shareFile);
-            }
-
-//            Long ttl = ((long) (config.getShare().getTtl() * 24 * 60 * 60 * 1000)) - (System.currentTimeMillis() - shareDir.lastModified());
-
-//            Share share = new Share();
-        shareInfo.setId(shareId);
-        shareInfo.setTtl(ttl);
-        shareInfo.setFiles(files);
-//            share.setToken(shareInfo.getToken());
-        shareInfo.setLastModified(shareDir.lastModified());
-
-            return shareInfo;
-//        } catch (IOException e) {
-//            logger.error(e.getMessage(), e);
-//            throw new ServerException(e);
-//        }
+        } catch (IOException e) {
+            logger.warn("删除共享" + shareId + "，文件已损坏。" + e.getMessage());
+            deleteShareDir(shareId);
+            return null;
+        }
     }
 
     synchronized public File getShareDir(String shareId) {
@@ -113,24 +111,23 @@ public class ShareService {
         }
     }
 
-    synchronized public List<ShareInfo> getAllShares() {
-        ArrayList<ShareInfo> shares = new ArrayList<>();
-        File repo = new File(Util.REPO_ROOT);
-        if (!repo.exists()) {
-            repo.mkdirs();
-        }
-        for (String lv1Id : repo.list()) {
-            File lv1Dir = new File(repo, lv1Id);
-            for (String lv2Id : lv1Dir.list()) {
-                String shareId = lv1Id + lv2Id;
-                try {
-                    ShareInfo shareInfo = getShare(shareId);
-                    shares.add(shareInfo);
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }
-        return shares;
-    }
+//    synchronized public List<ShareInfo> getAllShares() {
+//        ArrayList<ShareInfo> shares = new ArrayList<>();
+//        File repo = new File(Util.REPO_ROOT);
+//        if (!repo.exists()) {
+//            repo.mkdirs();
+//        }
+//        for (String lv1Id : repo.list()) {
+//            File lv1Dir = new File(repo, lv1Id);
+//            for (String lv2Id : lv1Dir.list()) {
+//                String shareId = lv1Id + lv2Id;
+//                try {
+//                    ShareInfo shareInfo = getShare(shareId);
+//                } catch (IOException e) {
+//                    logger.error(e.getMessage(), e);
+//                }
+//            }
+//        }
+//        return shares;
+//    }
 }
