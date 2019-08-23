@@ -243,7 +243,7 @@ export default {
 <style>
 .mycard {
   /* max-width: 440px; */
-  min-height: 460px;
+  min-height: 480px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;
