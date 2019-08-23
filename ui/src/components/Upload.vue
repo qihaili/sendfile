@@ -37,7 +37,8 @@
         </el-row>
         <el-row style="margin-top: 10px; line-height: 28px;">
           <el-checkbox v-model="passwordEnabled">密码保护</el-checkbox>
-          <el-input style="width: 200px; margin-left: 10px;" size="mini" v-if="passwordEnabled" v-model="password"></el-input>
+          <el-input style="width: 200px; margin-left: 10px;" v-if="passwordEnabled" v-model="password" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
+          <!-- <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input> -->
         </el-row>
         <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
       </div>
@@ -99,6 +100,7 @@ export default {
       fileList: null,
       passwordEnabled: false,
       password: null,
+      showPassword: false,
       errorMsg: null
     }
   },
