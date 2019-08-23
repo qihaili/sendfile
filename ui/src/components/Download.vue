@@ -13,7 +13,7 @@
             <span>文件已加密，请输入密码</span>
           </el-row>
           <el-row style="margin-top: 10px;">
-            <el-input v-model="password" style="width: 300px; margin-right: 10px;"></el-input>
+            <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="getShare" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
             <el-button type="primary" @click="getShare">解锁</el-button>
           </el-row>
         </div>
@@ -39,7 +39,8 @@ export default {
       share: null,
       errorMsg: null,
       needPassword: false,
-      password: null
+      password: null,
+      showPassword: false
     }
   },
   created() {
@@ -63,8 +64,10 @@ export default {
       }).catch((error) => {
         if (error.response.status == 401) {
           this.needPassword = true
+          if(this.password) {
+            this.$message.error('密码错误')
+          }
         } else {
-          console.log(error)
           this.errorMsg = error.response.data.message ? error.response.data.message : error
         }
       }).finally(() => {
