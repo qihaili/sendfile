@@ -4,7 +4,10 @@
       <!-- <div slot="header">
         上传文件
       </div> -->
-      <div v-if="!isChooseUpload" style="text-align: left;">
+      <div v-if="!config" style="min-height: 300px; width: 100%; display: table; text-align: center;">
+        <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i>{{ errorMsg }}</p>
+      </div>
+      <div v-else-if="!isChooseUpload" style="text-align: left;">
         <el-upload
           ref="upload"
           drag
@@ -36,24 +39,25 @@
           <el-checkbox v-model="passwordEnabled">密码保护</el-checkbox>
           <el-input style="width: 200px; margin-left: 10px;" size="mini" v-if="passwordEnabled" v-model="password"></el-input>
         </el-row>
-        <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
+        <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus" style="margin-top: 20px;"/>
         <div style="height: 20px; line-height: 20px">
-          <span style="font-size: x-small">{{ speed }}</span>
+          <span style="font-size: small">{{ speed }}</span>
         </div>
-        <div v-if="share" style="text-align: left;">
-          <span style="font-size: x-small" v-if="config">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span>
+        <div v-if="share" style="text-align: left; position: relative; height: 260px;">
+          <span style="font-size: small" v-if="config">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span>
           <div style="margin: 20px 5px">
             <el-row>下载链接：</el-row>
-            <el-input :value="address" style="min-width: 350px;">
+            <el-input :value="address">
               <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制链接</el-button>
             </el-input>
-            <el-row style="font-size: xx-small"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
+            <el-row style="font-size: small"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
           </div>
-          <div style="text-align: center;">
-            <el-link type="primary" @click="backToHome">再次上传</el-link>
+          <!-- <div style="text-align: center; margin-top: 100px;"> -->
+          <div style="position: absolute; bottom: 0px; text-align: center; width: 100%;">
+            <el-link type="primary" icon="el-icon-s-home" @click="backToHome">再次上传</el-link>
           </div>
         </div>
         <div v-else style="margin: 50px 5px">
@@ -94,7 +98,8 @@ export default {
       uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded')),
       fileList: null,
       passwordEnabled: false,
-      password: null
+      password: null,
+      errorMsg: null
     }
   },
   computed: {
@@ -115,8 +120,9 @@ export default {
       if(!this.ttl) {
         this.ttl = this.config.share.ttlOptions[0].value
       }
-    }).catch((err) => {
-      this.$message.error({message: '<p>' + err.response.status + '-' + err.response.statusText + '</p><p>' + err.response.data + '</p>', dangerouslyUseHTMLString: true})
+    }).catch((error) => {
+      // this.$message.error(error.response.data.message ? error.response.data.message : error.toString())
+      this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
     }).finally(() => {
       loading.close()
     })
@@ -162,9 +168,9 @@ export default {
     },
     handleError(err) {
       // console.log(err)
-      var response = JSON.parse(err.message)
-
-      this.$message.error('上传失败。' + response.message)
+      this.$message.error('上传失败。' + err)
+      // var response = JSON.parse(err.message)
+      // this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
     },
     showProgress(event) {

@@ -1,30 +1,28 @@
 <template>
   <div>
-    <el-card style="width: 560px; height: 400px; display: inline-block; margin: 10px;">
-      <div slot="header">
-        文件（点击文件名下载）
-      </div>
-      <div style="height: 300px; position: relative">
-          <div v-if="loading">
-            <p>正在读取文件...</p>
-          </div>
-          <div v-else>
-            <files :share="share" v-if="share" :on-removed="shareRemoved" style="margin: 0px 50px 0px 50px;"></files>
-            <div v-else-if="needPassword" style="margin-top: 40px;">
-              <span>文件已加密，请输入密码</span>
-              <el-row style="margin-top: 10px;">
-                <el-input size="small" v-model="password" style="width: 200px; margin-right: 10px;">
-                </el-input>
-                <el-button size="small" type="primary" @click="getShare">解锁</el-button>
-              </el-row>
-            </div>
-            <div v-else>
-              <p>{{ errorMsg }}</p>
-            </div>
-          </div>
-          <div style="position: absolute; bottom: 0px; width: 100%;">
-            <el-link type="primary" @click="gotoUpload">使用SendFile共享文件</el-link>
-          </div>
+    <el-card style="width: 560px; min-height: 400px; display: inline-block; margin: 10px;">
+      <div style="min-height: 344px;">
+        <div v-if="share" style="min-height: 310px;">
+          <span>文件（点击文件名下载）</span>
+          <el-divider></el-divider>
+          <files :share="share" :on-removed="shareRemoved" style="margin: 0px 50px 0px 50px;"></files>
+        </div>
+        <div v-else-if="needPassword" style="min-height: 310px;">
+          <el-row style="height: 70px;"></el-row>
+          <el-row>
+            <span>文件已加密，请输入密码</span>
+          </el-row>
+          <el-row style="margin-top: 10px;">
+            <el-input v-model="password" style="width: 300px; margin-right: 10px;"></el-input>
+            <el-button type="primary" @click="getShare">解锁</el-button>
+          </el-row>
+        </div>
+        <div v-else style="min-height: 310px; width: 100%; display: table; text-align: center;">
+          <p style="font-size: large; vertical-align: middle; display: table-cell;">{{ errorMsg }}</p>
+        </div>
+        <div style="margin-top: 20px; width: 100%;">
+          <el-link type="primary" @click="gotoUpload">使用SendFile共享文件</el-link>
+        </div>
       </div>
     </el-card>
   </div>
@@ -38,9 +36,7 @@ export default {
   },
   data() {
     return {
-      // files: [],
       share: null,
-      loading: true,
       errorMsg: null,
       needPassword: false,
       password: null
@@ -54,6 +50,7 @@ export default {
       this.$router.push('/')
     },
     getShare() {
+      var loading = this.$loading()
       axios.get(
         `/api/shares/${this.$route.params.shareId}`, {
           headers: {
@@ -67,10 +64,11 @@ export default {
         if (error.response.status == 401) {
           this.needPassword = true
         } else {
-          this.errorMsg = error.response.data.message
+          console.log(error)
+          this.errorMsg = error.response.data.message ? error.response.data.message : error
         }
       }).finally(() => {
-          this.loading = false;
+          loading.close()
       })
     },
     shareRemoved(share) {
