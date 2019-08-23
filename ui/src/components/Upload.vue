@@ -62,7 +62,7 @@
       </div>
     </el-card>
     <transition>
-      <el-card class="mycard" v-if="uploadedList.length > 0" style="width: 440px;">
+      <el-card class="mycard" v-if="uploadedList.length > 0" style="width: 502px;">
         <transition-group name="list">
           <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
             <files :share="uploadedShare" :on-removed="shareRemoved"></files>

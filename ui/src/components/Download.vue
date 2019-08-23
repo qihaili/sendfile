@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card style="width: 400px; height: 400px; display: inline-block; margin: 10px;">
+    <el-card style="width: 560px; height: 400px; display: inline-block; margin: 10px;">
       <div slot="header">
         文件（点击文件名下载）
       </div>
@@ -9,7 +9,7 @@
             <p>正在读取文件...</p>
           </div>
           <div v-else>
-            <files :share="response" v-if="response" :on-removed="shareRemoved"></files>
+            <files :share="share" v-if="share" :on-removed="shareRemoved" style="margin: 0px 50px 0px 50px;"></files>
             <div v-else-if="needPassword" style="margin-top: 40px;">
               <span>文件已加密，请输入密码</span>
               <el-row style="margin-top: 10px;">
@@ -39,7 +39,7 @@ export default {
   data() {
     return {
       // files: [],
-      response: null,
+      share: null,
       loading: true,
       errorMsg: null,
       needPassword: false,
@@ -61,8 +61,8 @@ export default {
           }
         }
       ).then((data) => {
-          this.response = data.data
-          this.response.password = this.password
+          this.share = data.data
+          this.share.password = this.password
       }).catch((error) => {
         if (error.response.status == 401) {
           this.needPassword = true
@@ -76,7 +76,7 @@ export default {
     shareRemoved(share) {
       this.errorMsg = "文件已过期"
       this.needPassword = false
-      this.response = null
+      this.share = null
     }
   }
 }
