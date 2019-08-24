@@ -1,15 +1,11 @@
 <template>
   <div>
     <el-card class="mycard" style="width: 400px;">
-      <!-- <div slot="header">
-        上传文件
-      </div> -->
       <div v-if="!config" style="min-height: 300px; width: 100%; display: table; text-align: center;">
         <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i>{{ errorMsg }}</p>
       </div>
       <div v-else-if="!isChooseUpload" style="text-align: left;">
         <el-upload
-          ref="upload"
           drag
           action=""
           :show-file-list="true"
@@ -24,8 +20,8 @@
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
           <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config">可上传<span v-if="config.share.maxFileSize > 0">{{this.config.share.maxFileSize}}MB</span><span v-else>任意大小</span>的文件</div>
         </el-upload>
-        <el-row style="margin-top: 10px;">
-          <el-select v-if="config" v-model="ttl" placeholder="请选择" size="mini" style="width: 100px;">
+        <el-row style="margin-top: 5px; line-height: 42px;">
+          <el-select v-if="config" v-model="ttl" placeholder="请选择" style="width: 150px;">
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
               :key="index"
@@ -33,9 +29,9 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <span style="margin-left: 10px; font-size: small; color: #606266;">后过期</span>
+          <span style="margin-left: 10px; color: #606266;">后过期</span>
         </el-row>
-        <el-row style="margin-top: 10px; line-height: 28px;">
+        <el-row style="margin-top: 5px; line-height: 42px;">
           <el-checkbox v-model="passwordEnabled">密码保护</el-checkbox>
           <el-input style="width: 200px; margin-left: 10px;" v-if="passwordEnabled" v-model="password" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
           <!-- <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input> -->
@@ -47,7 +43,7 @@
         <div style="height: 20px; line-height: 20px">
           <span style="font-size: small">{{ speed }}</span>
         </div>
-        <div v-if="share" style="text-align: left; position: relative; height: 260px;">
+        <div v-if="share" style="text-align: left; position: relative; height: 280px;">
           <span style="font-size: small" v-if="config">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span>
           <div style="margin: 20px 5px">
             <el-row>下载链接：</el-row>
@@ -252,7 +248,7 @@ export default {
 <style>
 .mycard {
   /* max-width: 440px; */
-  min-height: 480px;
+  min-height: 500px;
   /* width: auto; */
   /* height: 450px; */
   margin: 10px;

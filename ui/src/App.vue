@@ -3,7 +3,7 @@
     <!-- <img alt="Vue logo" src="./assets/logo.png"> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
     <!-- <Upload/> -->
-    <el-row>
+    <el-row style="line-height: 100px;">
       <i class="el-icon-s-promotion" style="margin-right: 20px; font-size: 60px; color: #409EFF; vertical-align: middle;"></i><span style="font-size: 40px; font-weight: bold; color: #606266; vertical-align: middle;">Send File</span>
     </el-row>
     <router-view/>
@@ -23,6 +23,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 30px;
 }
 </style>
