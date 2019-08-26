@@ -72,7 +72,8 @@ public class ShareController {
     ResponseEntity<InputStreamResource> download(@PathVariable String shareId, @PathVariable String filePath, HttpSession session) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (shareInfo.getPassword() == null || shareAuthorized(session, shareId)) {
+            // TODO 下载文件同样需要验证密码或Token
+//            if (shareInfo.getPassword() == null || shareAuthorized(session, shareId)) {
                 File file = new File(new File(shareService.getShareDir(shareId), Util.FILES_DIR), filePath);
                 try {
                     InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -85,9 +86,9 @@ public class ShareController {
                     logger.error(e.getMessage(), e);
                     throw new NotFoundException("未找到文件（" + filePath + "）", e);
                 }
-            } else {
-                throw new UnauthorizedException();
-            }
+//            } else {
+//                throw new UnauthorizedException();
+//            }
         } else {
             throw new BadRequestException("未找到共享：" + shareId);
         }
