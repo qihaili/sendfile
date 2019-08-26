@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -33,8 +32,11 @@ public class ShareController {
     @Autowired
     private ShareService shareService;
 
+    @Autowired
+    private HttpSession session;
+
     @PostMapping
-    ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files, HttpSession session) {
+    ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files) {
         try {
             ShareService.CreateShareResult result = shareService.createShareDir();
             File shareDir = result.dir;
@@ -62,7 +64,7 @@ public class ShareController {
             ShareWithToken shareWithToken = new ShareWithToken();
             BeanUtils.copyProperties(shareInfo1, shareWithToken);
 
-            getOwnShares(session).add(shareId);
+            getOwnShares().add(shareId);
 
             return shareWithToken;
         } catch (IOException e) {
@@ -72,11 +74,11 @@ public class ShareController {
     }
 
     @GetMapping("{shareId}/{filePath}")
-    ResponseEntity<InputStreamResource> download(@PathVariable String shareId, @PathVariable String filePath, HttpSession session) {
+    ResponseEntity<InputStreamResource> download(@PathVariable String shareId, @PathVariable String filePath) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
             // 下载文件同样需要验证密码或Token
-            if (shareInfo.getPassword() == null || isShareOwner(session, shareId) || isShareViewer(session, shareId)) {
+            if (shareInfo.getPassword() == null || isShareOwner(shareId) || isShareViewer(shareId)) {
                 File file = new File(new File(shareService.getShareDir(shareId), Util.FILES_DIR), filePath);
                 try {
                     InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -98,10 +100,10 @@ public class ShareController {
     }
 
     @GetMapping("{shareId}")
-    Share get(@PathVariable String shareId, HttpSession session) {
+    Share get(@PathVariable String shareId) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (shareInfo.getPassword() == null || isShareOwner(session, shareId) || isShareViewer(session, shareId)) {
+            if (shareInfo.getPassword() == null || isShareOwner(shareId) || isShareViewer(shareId)) {
                 Share share = new Share();
                 BeanUtils.copyProperties(shareInfo, share);
                 return share;
@@ -114,10 +116,10 @@ public class ShareController {
     }
 
     @DeleteMapping("{shareId}")
-    void delete(@PathVariable String shareId, @RequestHeader String token, HttpSession session) {
+    void delete(@PathVariable String shareId, @RequestHeader String token) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (isShareOwner(session, shareId)) {
+            if (isShareOwner(shareId)) {
                 shareService.deleteShareDir(shareId);
             } else {
                 throw new UnauthorizedException();
@@ -128,10 +130,10 @@ public class ShareController {
     }
 
     @PostMapping("viewer/authorize")
-    void authorizeViewer(@RequestBody ShareWithPassword[] shareWithPasswords, HttpSession session) {
+    void authorizeViewer(@RequestBody ShareWithPassword[] shareWithPasswords) {
         for (ShareWithPassword share : shareWithPasswords) {
             if (shareService.getShare(share.getId()).getPassword().equals(share.getPassword())) {
-                getCanReadShares(session).add(share.getId());
+                getCanReadShares().add(share.getId());
             } else {
                 throw new UnauthorizedException("密码错误，shareId: " + share.getId());
             }
@@ -149,12 +151,12 @@ public class ShareController {
     }
 
     @PostMapping("owner/authorize")
-    void authorizeOwner(@RequestBody ShareWithToken[] shareTokens, HttpSession session) {
+    void authorizeOwner(@RequestBody ShareWithToken[] shareTokens) {
         for (ShareWithToken share : shareTokens) {
             ShareInfo shareInfo = shareService.getShare(share.getId());
             if (shareInfo != null) {
                 if (shareInfo.getToken().equals(share.getToken())) {
-                    getOwnShares(session).add(share.getId());
+                    getOwnShares().add(share.getId());
                 } else {
                     throw new UnauthorizedException("token错误，shareId: " + share.getId());
                 }
@@ -162,12 +164,12 @@ public class ShareController {
         }
     }
 
-    private boolean isShareOwner(HttpSession session, String shareId) {
-        Set<String> ownShares = getOwnShares(session);
+    private boolean isShareOwner(String shareId) {
+        Set<String> ownShares = getOwnShares();
         return ownShares.contains(shareId);
     }
 
-    private Set<String> getOwnShares(HttpSession session) {
+    private Set<String> getOwnShares() {
         Set<String> ownShares = (Set) session.getAttribute("ownShares");
         if (ownShares == null) {
             ownShares = new HashSet<>();
@@ -178,12 +180,12 @@ public class ShareController {
 
 
     // 是否有查看权限
-    private boolean isShareViewer(HttpSession session, String shareId) {
-        Set<String> canReadShares = getCanReadShares(session);
+    private boolean isShareViewer(String shareId) {
+        Set<String> canReadShares = getCanReadShares();
         return canReadShares.contains(shareId);
     }
 
-    private Set<String> getCanReadShares(HttpSession session) {
+    private Set<String> getCanReadShares() {
         Set<String> canReadShares = (Set) session.getAttribute("canReadShares");
         if (canReadShares == null) {
             canReadShares = new HashSet<>();
