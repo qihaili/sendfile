@@ -63,7 +63,7 @@
       </div>
     </el-card>
     <transition>
-      <el-card class="mycard" v-if="uploadedList.length > 0" style="width: 502px;">
+      <el-card class="mycard" v-if="uploadedList && uploadedList.length > 0" style="width: 502px;">
         <transition-group name="list">
           <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
             <files :share="uploadedShare" :on-removed="shareRemoved"></files>
@@ -92,7 +92,7 @@ export default {
       lastLoadTime: null,
       config: null,
       ttl: null,
-      uploadedList: localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded')),
+      uploadedList: null,
       fileList: null,
       passwordEnabled: false,
       password: null,
@@ -105,9 +105,11 @@ export default {
       return window.location.href + this.share.id
     }
   },
-  created() {
+  async created() {
     var loading = this.$loading()
-    axios.get('/api/config')
+
+    // 获取后端配置信息
+    await axios.get('/api/config')
     .then((data) => {
       this.config = data.data
       for(var option of this.config.share.ttlOptions) {
@@ -122,9 +124,18 @@ export default {
       // this.$message.error(error.response.data.message ? error.response.data.message : error.toString())
       this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
     }).finally(() => {
-      loading.close()
     })
-    // setInterval(this.syncUploadedShareList, 3000);
+
+    // 获取owner权限
+    var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+    await axios.post('/api/shares/owner/authorize', storedList)
+    .then(() => {
+      this.uploadedList = storedList
+    }).catch((error) => {
+      this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
+    })
+
+    loading.close()
   },
   methods: {
     submitUpload() {
@@ -194,9 +205,6 @@ export default {
         }
       }
     },
-    handleRemove() {
-      return false;
-    },
     chooseUpload(file) {
       if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
         this.$message.error('文件过大，不能超过' + this.maxFileSize + 'MB')
@@ -220,7 +228,6 @@ export default {
       // this.isChooseDownload = true
     },
     shareRemoved(share) {
-      // console.log('shareRemoved')
       // var index = this.uploadedList.indexOf(share)
       var index = -1
       for(var i=0; i<this.uploadedList.length; i++) {

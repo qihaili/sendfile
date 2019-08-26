@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -33,7 +34,7 @@ public class ShareController {
     private ShareService shareService;
 
     @PostMapping
-    ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files) {
+    ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files, HttpSession session) {
         try {
             ShareService.CreateShareResult result = shareService.createShareDir();
             File shareDir = result.dir;
@@ -61,6 +62,8 @@ public class ShareController {
             ShareWithToken shareWithToken = new ShareWithToken();
             BeanUtils.copyProperties(shareInfo1, shareWithToken);
 
+            getOwnShares(session).add(shareId);
+
             return shareWithToken;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -72,8 +75,8 @@ public class ShareController {
     ResponseEntity<InputStreamResource> download(@PathVariable String shareId, @PathVariable String filePath, HttpSession session) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            // TODO 下载文件同样需要验证密码或Token
-//            if (shareInfo.getPassword() == null || shareAuthorized(session, shareId)) {
+            // 下载文件同样需要验证密码或Token
+            if (shareInfo.getPassword() == null || isShareOwner(session, shareId) || isShareViewer(session, shareId)) {
                 File file = new File(new File(shareService.getShareDir(shareId), Util.FILES_DIR), filePath);
                 try {
                     InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -86,19 +89,19 @@ public class ShareController {
                     logger.error(e.getMessage(), e);
                     throw new NotFoundException("未找到文件（" + filePath + "）", e);
                 }
-//            } else {
-//                throw new UnauthorizedException();
-//            }
+            } else {
+                throw new UnauthorizedException();
+            }
         } else {
-            throw new BadRequestException("未找到共享：" + shareId);
+            throw new NotFoundException("未找到共享：" + shareId);
         }
     }
 
     @GetMapping("{shareId}")
-    Share get(@PathVariable String shareId, @RequestHeader(required = false) String token, @RequestHeader(required = false) String password, HttpSession session) {
+    Share get(@PathVariable String shareId, HttpSession session) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (shareInfo.getPassword() == null || shareInfo.getToken().equals(token) || shareAuthorized(session, shareId)) {
+            if (shareInfo.getPassword() == null || isShareOwner(session, shareId) || isShareViewer(session, shareId)) {
                 Share share = new Share();
                 BeanUtils.copyProperties(shareInfo, share);
                 return share;
@@ -106,49 +109,87 @@ public class ShareController {
                 throw new UnauthorizedException();
             }
         } else {
-            throw new BadRequestException("未找到共享：" + shareId);
+            throw new NotFoundException("未找到共享：" + shareId);
         }
     }
 
     @DeleteMapping("{shareId}")
-    void delete(@PathVariable String shareId, @RequestHeader String token) {
+    void delete(@PathVariable String shareId, @RequestHeader String token, HttpSession session) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (shareInfo.getToken().equals(token)) {
+            if (isShareOwner(session, shareId)) {
                 shareService.deleteShareDir(shareId);
             } else {
                 throw new UnauthorizedException();
             }
         } else {
-            throw new BadRequestException("未找到共享：" + shareId);
+            throw new NotFoundException("未找到共享：" + shareId);
         }
     }
 
-    @PostMapping("{shareId}/authorize")
-    void authorized(@PathVariable String shareId, @RequestBody AuthenticateInfo authenticateInfo, HttpSession session) {
-        ShareInfo shareInfo = shareService.getShare(shareId);
-        if (shareInfo.getPassword() != null) {
-            if (shareInfo.getPassword().equals(authenticateInfo.getPassword())) {
-                getAuthorizedShares(session).add(shareId);
+    @PostMapping("viewer/authorize")
+    void authorizeViewer(@RequestBody ShareWithPassword[] shareWithPasswords, HttpSession session) {
+        for (ShareWithPassword share : shareWithPasswords) {
+            if (shareService.getShare(share.getId()).getPassword().equals(share.getPassword())) {
+                getCanReadShares(session).add(share.getId());
             } else {
-                throw new UnauthorizedException();
+                throw new UnauthorizedException("密码错误，shareId: " + share.getId());
             }
-        } else {
-            throw new BadRequestException("该共享无需验证");
+        }
+//        ShareInfo shareInfo = shareService.getShare(shareId);
+//        if (shareInfo.getPassword() != null) {
+//            if (shareInfo.getPassword().equals(authenticateInfo.getPassword())) {
+//                getCanReadShares(session).add(shareId);
+//            } else {
+//                throw new UnauthorizedException();
+//            }
+//        } else {
+//            throw new BadRequestException("该共享无需验证");
+//        }
+    }
+
+    @PostMapping("owner/authorize")
+    void authorizeOwner(@RequestBody ShareWithToken[] shareTokens, HttpSession session) {
+        for (ShareWithToken share : shareTokens) {
+            ShareInfo shareInfo = shareService.getShare(share.getId());
+            if (shareInfo != null) {
+                if (shareInfo.getToken().equals(share.getToken())) {
+                    getOwnShares(session).add(share.getId());
+                } else {
+                    throw new UnauthorizedException("token错误，shareId: " + share.getId());
+                }
+            }
         }
     }
 
-    private boolean shareAuthorized(HttpSession session, String shareId) {
-        return getAuthorizedShares(session).contains(shareId);
+    private boolean isShareOwner(HttpSession session, String shareId) {
+        Set<String> ownShares = getOwnShares(session);
+        return ownShares.contains(shareId);
     }
 
-    private Set<String> getAuthorizedShares(HttpSession session) {
-        Set<String> authorizedShares = (Set) session.getAttribute("authorizedShares");
-        if (authorizedShares == null) {
-            authorizedShares = new HashSet<>();
-            session.setAttribute("authorizedShares", authorizedShares);
+    private Set<String> getOwnShares(HttpSession session) {
+        Set<String> ownShares = (Set) session.getAttribute("ownShares");
+        if (ownShares == null) {
+            ownShares = new HashSet<>();
+            session.setAttribute("ownShares", ownShares);
         }
-        return authorizedShares;
+        return ownShares;
+    }
+
+
+    // 是否有查看权限
+    private boolean isShareViewer(HttpSession session, String shareId) {
+        Set<String> canReadShares = getCanReadShares(session);
+        return canReadShares.contains(shareId);
+    }
+
+    private Set<String> getCanReadShares(HttpSession session) {
+        Set<String> canReadShares = (Set) session.getAttribute("canReadShares");
+        if (canReadShares == null) {
+            canReadShares = new HashSet<>();
+            session.setAttribute("canReadShares", canReadShares);
+        }
+        return canReadShares;
     }
 
 }

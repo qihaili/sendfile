@@ -52,10 +52,11 @@ export default {
     },
     authorize() {
       axios.post(
-        `/api/shares/${this.$route.params.shareId}/authorize`,
-        {
+        '/api/shares/viewer/authorize',
+        [{
+          id: this.$route.params.shareId,
           password: this.password
-        }
+        }]
       ).then(() => {
         this.getShare()
       }).catch((error) => {

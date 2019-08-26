@@ -5,6 +5,9 @@ spring:
     encoding:
       force: true
       charset: UTF-8
+  mvc:
+    favicon:
+      enabled: false
 logging:
 #  file: log/sendfile.log
   level:
