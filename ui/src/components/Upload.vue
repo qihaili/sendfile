@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="mycard" style="width: 400px;">
-      <div v-if="!config" style="min-height: 300px; width: 100%; display: table; text-align: center;">
+      <div v-if="errorMsg" style="min-height: 300px; width: 100%; display: table; text-align: center;">
         <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i>{{ errorMsg }}</p>
       </div>
       <div v-else-if="!isChooseUpload" style="text-align: left;">
@@ -134,7 +134,7 @@ export default {
     }).catch((error) => {
       this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
     })
-
+    
     loading.close()
   },
   methods: {
