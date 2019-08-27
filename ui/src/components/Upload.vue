@@ -1,10 +1,11 @@
 <template>
   <div>
-    <el-card class="mycard" style="width: 400px;">
+    <el-card class="mycard">
       <div v-if="errorMsg" style="min-height: 300px; width: 100%; display: table; text-align: center;">
         <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i>{{ errorMsg }}</p>
       </div>
-      <div v-else-if="!isChooseUpload" style="text-align: left;">
+      <div v-else-if="!isChooseUpload">
+        <div style="text-align: left; width: 358px; margin: auto;">
         <el-upload
           drag
           action=""
@@ -37,6 +38,7 @@
           <!-- <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input> -->
         </el-row>
         <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
+        </div>
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus" style="margin-top: 20px;"/>
@@ -63,7 +65,7 @@
       </div>
     </el-card>
     <transition>
-      <el-card class="mycard" v-if="uploadedList && uploadedList.length > 0" style="width: 502px;">
+      <el-card class="mycard" v-if="uploadedList && uploadedList.length > 0">
         <transition-group name="list">
           <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
             <files :share="uploadedShare" :on-removed="shareRemoved"></files>
@@ -257,7 +259,7 @@ export default {
 .mycard {
   /* max-width: 440px; */
   min-height: 500px;
-  /* width: auto; */
+  width: 500px;
   /* height: 450px; */
   margin: 10px;
   display: inline-block;
