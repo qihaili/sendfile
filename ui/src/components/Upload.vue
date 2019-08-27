@@ -128,13 +128,14 @@ export default {
 
     // 获取owner权限
     var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+    console.log(storedList)
     await axios.post('/api/shares/owner/authorize', storedList)
     .then(() => {
       this.uploadedList = storedList
     }).catch((error) => {
       this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
     })
-    
+
     loading.close()
   },
   methods: {

@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -153,12 +154,15 @@ public class ShareController {
     @PostMapping("owner/authorize")
     void authorizeOwner(@RequestBody ShareWithToken[] shareTokens) {
         for (ShareWithToken share : shareTokens) {
-            ShareInfo shareInfo = shareService.getShare(share.getId());
-            if (shareInfo != null) {
-                if (shareInfo.getToken().equals(share.getToken())) {
-                    getOwnShares().add(share.getId());
-                } else {
-                    throw new UnauthorizedException("token错误，shareId: " + share.getId());
+            String shareId = share.getId();
+            if (!StringUtils.isEmpty(shareId)) {
+                ShareInfo shareInfo = shareService.getShare(shareId);
+                if (shareInfo != null) {
+                    if (shareInfo.getToken().equals(share.getToken())) {
+                        getOwnShares().add(shareId);
+                    } else {
+                        throw new UnauthorizedException("token错误，shareId: " + shareId);
+                    }
                 }
             }
         }
