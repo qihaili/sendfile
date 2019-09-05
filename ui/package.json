@@ -13,6 +13,7 @@
     "element-ui": "^2.11.1",
     "vue": "^2.6.10",
     "vue-clipboard2": "^0.3.0",
+    "vue-i18n": "^8.14.0",
     "vue-router": "^3.0.7"
   },
   "devDependencies": {

@@ -13,18 +13,22 @@
     <el-row>
       <div style="display: inline-block; float: left; text-align: left;">
         <!-- <el-row><span style="vertical-align: middle; font-size: xx-small;" v-if="share.lastModified">上传于 {{ new Date(share.lastModified).toLocaleString() }}</span></el-row> -->
-        <el-row><span style="vertical-align: middle; font-size: small;">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span></el-row>
+        <!-- <el-row><span style="vertical-align: middle; font-size: small;"><span v-if="share.ttl">{{$t('msg.expireTip.normal', {ttl: this.util.humanreadableDuration(share.ttl)})}}</span><span v-else>{{$t('msg.expireTip.neverExpire')}}</span></span></el-row> -->
+        <!-- <el-row><span style="vertical-align: middle; font-size: small;">{{$t('msg.humanReadableDuration', {day: this.util.getDuration(share.ttl).day, hour: this.util.getDuration(share.ttl).hour, minute: this.util.getDuration(share.ttl).minute})}}</span></el-row> -->
+        <!-- <el-row><span style="vertical-align: middle; font-size: small;"><i18n path="msg.humanReadableDuration" tag="span"><div slot="duration">{{duration.day}}</div></i18n></span></el-row> -->
+        <el-row><span style="vertical-align: middle; font-size: small;"><humanReadableDuration :ttl="this.share.ttl"/></span></el-row>
       </div>
       <div style="display: inline-block; float: right;">
-        <el-tooltip content="复制链接" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
-        <el-tooltip v-if="share.password" content="复制密码" placement="top"><el-button size="mini" v-clipboard:copy="share.password" v-clipboard:success="onCopyPasswordSuccess" icon="el-icon-key"></el-button></el-tooltip>
-        <el-tooltip content="删除文件" placement="top" v-if="share.token"><el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteShare" :loading="deleteLoading"></el-button></el-tooltip>
+        <el-tooltip :content="$t('msg.files.copyLink')" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>
+        <el-tooltip v-if="share.password" :content="$t('msg.files.copyPassword')" placement="top"><el-button size="mini" v-clipboard:copy="share.password" v-clipboard:success="onCopyPasswordSuccess" icon="el-icon-key"></el-button></el-tooltip>
+        <el-tooltip v-if="share.token" :content="$t('msg.files.deleteFile')" placement="top"><el-button type="danger" size="mini" icon="el-icon-delete" @click="deleteShare" :loading="deleteLoading"></el-button></el-tooltip>
       </div>
     </el-row>
   </div>
 </template>
 <script>
 import axios from 'axios'
+import humanReadableDuration from './HumanReadableDuration'
 import { clearInterval, setInterval } from 'timers';
 export default {
   props: {
@@ -35,6 +39,9 @@ export default {
       type: Function,
       required: true
     }
+  },
+  components: {
+    humanReadableDuration
   },
   data() {
     return {
@@ -53,10 +60,10 @@ export default {
   },
   methods: {
     onCopySuccess() {
-      this.$message.success('地址已复制')
+      this.$message.success(this.$t('msg.files.linkCopied'))
     },
     onCopyPasswordSuccess() {
-      this.$message.success('密码已复制')
+      this.$message.success(this.$t('msg.files.passwordCopied'))
     },
     syncShare() {
       if (this.countdown) {
@@ -85,8 +92,10 @@ export default {
     },
     deleteShare() {
       this.deleteLoading = true
-      this.$confirm('确定删除文件共享？', {
-        type: 'warning'
+      this.$confirm(this.$t('msg.files.confirmDelete'), {
+        type: 'warning',
+        confirmButtonText: this.$t('msg.files.okButton'),
+        cancelButtonText: this.$t('msg.files.cancelButton')
       }).then(() => {
         axios.delete(
           `/api/shares/${this.share.id}`, {

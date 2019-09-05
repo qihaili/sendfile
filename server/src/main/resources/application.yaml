@@ -26,4 +26,4 @@ sendfile:
       - name: 30天
         value: 30D
     scan-interval: 1  # 单位：小时
-    max-file-size: -1 # 单位：MB
+    max-file-size: 500 # 单位：MB

@@ -17,12 +17,13 @@
           >
           <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
           <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击添加文件</em></div>
+          <div class="el-upload__text">{{$t('msg.upload.dragFile.1')}}<em>{{$t('msg.upload.dragFile.2')}}</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
-          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config">可上传<span v-if="config.share.maxFileSize > 0">{{this.config.share.maxFileSize}}MB</span><span v-else>任意大小</span>的文件</div>
+          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config"><span v-if="config.share.maxFileSize > 0">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize + 'MB'})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
         </el-upload>
         <el-row style="margin-top: 5px; line-height: 42px;">
-          <el-select v-if="config" v-model="ttl" placeholder="请选择" style="width: 150px;">
+          <span v-if="$i18n.locale == 'en-US'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
+          <el-select v-if="config" v-model="ttl" style="width: 150px; margin: 0px 10px 0px 10px;">
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
               :key="index"
@@ -30,14 +31,14 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <span style="margin-left: 10px; color: #606266;">后过期</span>
+          <span v-if="$i18n.locale == 'zh-CN'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
         </el-row>
         <el-row style="margin-top: 5px; line-height: 42px;">
-          <el-checkbox v-model="passwordEnabled">密码保护</el-checkbox>
+          <el-checkbox v-model="passwordEnabled">{{$t('msg.upload.enablePassword')}}</el-checkbox>
           <el-input style="width: 200px; margin-left: 10px;" v-if="passwordEnabled" v-model="password" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input>
           <!-- <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input> -->
         </el-row>
-        <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">上传</el-button>
+        <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">{{$t('msg.upload.uploadButton')}}</el-button>
         </div>
       </div>
       <div v-else>
@@ -46,21 +47,21 @@
           <span style="font-size: small">{{ speed }}</span>
         </div>
         <div v-if="share" style="text-align: left; position: relative; height: 280px;">
-          <span style="font-size: small" v-if="config">文件<span v-if="share.ttl">将于 {{ this.util.humanreadableDuration(share.ttl) }} </span><span v-else>永不</span>过期</span>
+          <span style="font-size: small" v-if="config"><humanReadableDuration :ttl="this.share.ttl"/></span>
           <div style="margin: 20px 5px">
-            <el-row>下载链接：</el-row>
+            <el-row>{{$t('msg.uploaded.downloadLink')}}</el-row>
             <el-input :value="address">
-              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">复制链接</el-button>
+              <el-button slot="append" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" type="primary" size="mini">{{$t('msg.uploaded.copyLinkButton')}}</el-button>
             </el-input>
-            <el-row style="font-size: small"><i class="el-icon-warning" style="margin-right: 5px"/>复制链接地址，粘贴到浏览器地址栏中，并打开页面</el-row>
+            <el-row style="font-size: small"><i class="el-icon-warning" style="margin-right: 5px"/>{{$t('msg.uploaded.tip')}}</el-row>
           </div>
           <!-- <div style="text-align: center; margin-top: 100px;"> -->
           <div style="position: absolute; bottom: 0px; text-align: center; width: 100%;">
-            <el-link type="primary" icon="el-icon-s-home" @click="backToHome">再次上传</el-link>
+            <el-link type="primary" icon="el-icon-s-home" @click="backToHome">{{$t('msg.uploaded.backToHomeLink')}}</el-link>
           </div>
         </div>
         <div v-else style="margin: 50px 5px">
-          <span>正在上传，成功后生成下载链接。。。</span>
+          <span>{{$t('msg.message.uploading')}}</span>
         </div>
       </div>
     </el-card>
@@ -79,9 +80,11 @@
 <script>
 import axios from 'axios'
 import files from './Files'
+import humanReadableDuration from './HumanReadableDuration'
 export default {
   components: {
-    files
+    files,
+    humanReadableDuration
   },
   data() {
     return {
@@ -108,6 +111,7 @@ export default {
     }
   },
   async created() {
+    console.log(this.$t('msg.language'))
     var loading = this.$loading()
 
     // 获取后端配置信息
@@ -130,7 +134,6 @@ export default {
 
     // 获取owner权限
     var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
-    console.log(storedList)
     await axios.post('/api/shares/owner/authorize', storedList)
     .then(() => {
       this.uploadedList = storedList
@@ -167,7 +170,7 @@ export default {
       this.fileList = fileList
     },
     handleSuccess(response) {
-      this.$message.success('上传成功')
+      this.$message.success(this.$t('msg.message.uploadSuccess'))
       this.isSuccess = true
       this.share = response
       this.uploadStatus = 'success'
@@ -179,7 +182,7 @@ export default {
     },
     handleError(err) {
       // console.log(err)
-      this.$message.error('上传失败。' + err)
+      this.$message.error(this.$t('msg.message.uploadFail', {errMsg: err}))
       // var response = JSON.parse(err.message)
       // this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
@@ -210,7 +213,7 @@ export default {
     },
     chooseUpload(file) {
       if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
-        this.$message.error('文件过大，不能超过' + this.maxFileSize + 'MB')
+        this.$message.error(this.$t('msg.message.fileTooBig', {size: this.maxFileSize + 'MB'}))
         return false
       }
       this.isChooseUpload = true
@@ -218,7 +221,7 @@ export default {
       this.lastLoadTime = new Date().getTime()
     },
     onCopySuccess() {
-      this.$message.success('地址已复制')
+      this.$message.success(this.$t('msg.message.linkCopied'))
     },
     backToHome() {
       this.isChooseUpload = false
