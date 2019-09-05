@@ -1,13 +1,15 @@
 package cn.pers.qhl.sendfile;
 
-import cn.pers.qhl.sendfile.config.SendFileConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.servlet.support.RequestContextUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +20,10 @@ public class ShareService {
     private static final Logger logger = LoggerFactory.getLogger(ShareService.class);
 
     @Autowired
-    private SendFileConfig config;
+    private HttpServletRequest request;
+
+    @Autowired
+    private MessageSource messageSource;
 
     synchronized public ShareInfo getShare(String shareId) {
         File shareDir = getShareDir(shareId);
@@ -69,7 +74,8 @@ public class ShareService {
                 return shareDir;
             }
         } else {
-            throw new BadRequestException("非法id：" + shareId);
+//            throw new BadRequestException("非法id：" + shareId);
+            throw new BadRequestException(getI18nMessage("illegalId", shareId));
         }
     }
 
@@ -99,6 +105,14 @@ public class ShareService {
         if (lv1ShareDir.list().length == 0) {
             FileSystemUtils.deleteRecursively(lv1ShareDir);
         }
+    }
+
+    public String getI18nMessage(String messageKey) {
+        return getI18nMessage(messageKey, null);
+    }
+
+    public String getI18nMessage(String messageKey, String... objects) {
+        return messageSource.getMessage(messageKey, objects, RequestContextUtils.getLocale(request));
     }
 
     public static class CreateShareResult {

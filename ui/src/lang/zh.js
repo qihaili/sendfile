@@ -11,7 +11,8 @@ export const msg = {
     },
     expire: '后过期',
     enablePassword: '密码保护',
-    uploadButton: '上传'
+    uploadButton: '上传',
+    wrongToken: 'Token验证错误'
   },
   uploaded: {
     downloadLink: '下载链接：',

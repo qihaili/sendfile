@@ -8,6 +8,8 @@ spring:
   mvc:
     favicon:
       enabled: false
+  messages:
+    basename: i18n/messages
 logging:
 #  file: log/sendfile.log
   level:

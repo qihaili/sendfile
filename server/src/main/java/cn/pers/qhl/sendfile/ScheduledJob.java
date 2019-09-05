@@ -26,7 +26,12 @@ public class ScheduledJob implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
         logger.debug("注册扫描定时任务");
-        long interval = Util.parseTtlToMillis(config.getShare().getScanInterval());
+        long interval = 0;
+        try {
+            interval = Util.parseTtlToMillis(config.getShare().getScanInterval());
+        } catch (IllegalUnitException e) {
+            throw new RuntimeException("扫描间隔配置的单位错误：" + e.getMessage());
+        }
         long oneHour = 1000 * 60 * 60;
         long oneMinute = 1000 * 60;
         if (interval < oneMinute) {

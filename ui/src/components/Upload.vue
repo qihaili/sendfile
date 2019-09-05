@@ -2,7 +2,7 @@
   <div>
     <el-card class="mycard">
       <div v-if="errorMsg" style="min-height: 300px; width: 100%; display: table; text-align: center;">
-        <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i>{{ errorMsg }}</p>
+        <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
       </div>
       <div v-else-if="!isChooseUpload">
         <div style="text-align: left; width: 358px; margin: auto;">
@@ -140,7 +140,10 @@ export default {
       .then(() => {
         this.uploadedList = storedList
       }).catch((error) => {
-        this.errorMsg = error.response.data.message || error
+        // this.errorMsg = error.response.data.message || error
+        this.errorMsg = {
+          msg: 'msg.upload.wrongToken'
+        }
       })
       if (this.errorMsg) {
         return

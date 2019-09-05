@@ -1,6 +1,5 @@
 package cn.pers.qhl.sendfile;
 
-import cn.pers.qhl.sendfile.config.SendFileConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +25,6 @@ import java.util.Set;
 public class ShareController {
 
     private static final Logger logger = LoggerFactory.getLogger(ShareController.class);
-
-    @Autowired
-    private SendFileConfig config;
 
     @Autowired
     private ShareService shareService;
@@ -71,6 +67,9 @@ public class ShareController {
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
             throw new ServerException(e);
+        } catch (IllegalUnitException e) {
+            logger.error(e.getMessage(), e);
+            throw new BadRequestException(shareService.getI18nMessage("illegalUnit: " + e.getMessage()));
         }
     }
 
@@ -90,13 +89,13 @@ public class ShareController {
                             .body(resource);
                 } catch (FileNotFoundException e) {
                     logger.error(e.getMessage(), e);
-                    throw new NotFoundException("未找到文件（" + filePath + "）", e);
+                    throw new NotFoundException(shareService.getI18nMessage("notFound.file", filePath), e);
                 }
             } else {
                 throw new UnauthorizedException();
             }
         } else {
-            throw new NotFoundException("未找到共享：" + shareId);
+            throw new NotFoundException(shareService.getI18nMessage("notFound.share", shareId));
         }
     }
 
@@ -112,7 +111,7 @@ public class ShareController {
                 throw new UnauthorizedException();
             }
         } else {
-            throw new NotFoundException("未找到共享：" + shareId);
+            throw new NotFoundException(shareService.getI18nMessage("notFound.share", shareId));
         }
     }
 
@@ -126,7 +125,7 @@ public class ShareController {
                 throw new UnauthorizedException();
             }
         } else {
-            throw new NotFoundException("未找到共享：" + shareId);
+            throw new NotFoundException(shareService.getI18nMessage("notFound.share", shareId));
         }
     }
 
@@ -136,7 +135,7 @@ public class ShareController {
             if (shareService.getShare(share.getId()).getPassword().equals(share.getPassword())) {
                 getCanReadShares().add(share.getId());
             } else {
-                throw new UnauthorizedException("密码错误，shareId: " + share.getId());
+                throw new UnauthorizedException();
             }
         }
 //        ShareInfo shareInfo = shareService.getShare(shareId);
@@ -161,7 +160,7 @@ public class ShareController {
                     if (shareInfo.getToken().equals(share.getToken())) {
                         getOwnShares().add(shareId);
                     } else {
-                        throw new UnauthorizedException("token错误，shareId: " + shareId);
+                        throw new UnauthorizedException();
                     }
                 }
             }
