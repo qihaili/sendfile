@@ -24,4 +24,4 @@ sendfile:
       - value: 7D
       - value: 30D
     scan-interval: 1H  # 单位：M/H/D
-    max-file-size: 500MB # 单位：B/KB/MB/GB/TB。默认单位：B。任意大小：-1
+    max-file-size: 10GB # 单位：B/KB/MB/GB/TB。默认单位：B。任意大小：-1
