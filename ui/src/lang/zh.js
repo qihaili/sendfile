@@ -34,8 +34,7 @@ export const msg = {
   durationUnit: {
     day: '天',
     hour: '小时',
-    minute: '分钟',
-    soon: '马上'
+    minute: '分钟'
   },
   download: {
     title: '文件（点击文件名下载）',
