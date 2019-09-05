@@ -26,6 +26,13 @@ public class ScheduledJob implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
         logger.debug("注册扫描定时任务");
+        long interval = Util.parseTtlToMillis(config.getShare().getScanInterval());
+        long oneHour = 1000 * 60 * 60;
+        long oneMinute = 1000 * 60;
+        if (interval < oneMinute) {
+            logger.warn("扫描时间设置（" + config.getShare().getScanInterval() + "）过短。已使用默认值：1小时");
+            interval = oneHour;
+        }
         scheduledTaskRegistrar.addFixedRateTask(() -> {
             logger.debug("检测过期的共享");
 
@@ -40,6 +47,7 @@ public class ScheduledJob implements SchedulingConfigurer {
                     shareService.getShare(shareId);
                 }
             }
-        }, new Double(config.getShare().getScanInterval() * 60 * 60 * 1000).longValue());
+//        }, new Double(config.getShare().getScanInterval() * 60 * 60 * 1000).longValue());
+        }, interval);
     }
 }

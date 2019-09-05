@@ -4,9 +4,9 @@ public class ShareConfig {
 
     private TtlOption[] ttlOptions;
 
-    private Double scanInterval;
+    private String scanInterval;
 
-    private Double maxFileSize;
+    private String maxFileSize;
 
     public TtlOption[] getTtlOptions() {
         return ttlOptions;
@@ -16,19 +16,19 @@ public class ShareConfig {
         this.ttlOptions = ttlOptions;
     }
 
-    public Double getScanInterval() {
+    public String getScanInterval() {
         return scanInterval;
     }
 
-    public void setScanInterval(Double scanInterval) {
+    public void setScanInterval(String scanInterval) {
         this.scanInterval = scanInterval;
     }
 
-    public Double getMaxFileSize() {
+    public String getMaxFileSize() {
         return maxFileSize;
     }
 
-    public void setMaxFileSize(Double maxFileSize) {
+    public void setMaxFileSize(String maxFileSize) {
         this.maxFileSize = maxFileSize;
     }
 }

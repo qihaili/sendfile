@@ -54,9 +54,9 @@ public class ShareController {
             objectMapper.writeValue(new File(shareDir, Util.SHARE_INFO_FILE), shareInfo);
 
             for (MultipartFile file : files) {
-                if (config.getShare().getMaxFileSize() > 0 && file.getSize() > config.getShare().getMaxFileSize().longValue() * 1024 * 1024) {
-                    throw new BadRequestException("文件过大");
-                }
+//                if (config.getShare().getMaxFileSize() > 0 && file.getSize() > config.getShare().getMaxFileSize().longValue() * 1024 * 1024) {
+//                    throw new BadRequestException("文件过大");
+//                }
                 File destFile = new File(filesDir, file.getOriginalFilename());
                 file.transferTo(destFile.getCanonicalFile());
             }

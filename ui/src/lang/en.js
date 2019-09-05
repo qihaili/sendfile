@@ -1,6 +1,5 @@
 export const msg = {
   languageName: 'English',
-  language: 'Language',
   upload: {
     dragFile: {
       1: 'Drag files here, or ',
@@ -34,7 +33,10 @@ export const msg = {
   durationUnit: {
     day: 'd ',
     hour: 'h ',
-    minute: 'm '
+    minute: 'm ',
+    D: ' Day(s)',
+    H: ' Hour(s)',
+    M: ' Minute(s)'
   },
   download: {
     title: 'File (click file name to download)',

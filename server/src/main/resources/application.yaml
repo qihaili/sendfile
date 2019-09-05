@@ -15,7 +15,7 @@ logging:
     cn.pers.qhl.sendfile.*: DEBUG
 sendfile:
   share:
-    ttl-options:
+    ttl-options:  # 单位：M/H/D。永不过期：-1
       - name: 1小时
         value: 1H
       - name: 1天
@@ -25,5 +25,5 @@ sendfile:
         value: 7D
       - name: 30天
         value: 30D
-    scan-interval: 1  # 单位：小时
-    max-file-size: 500 # 单位：MB
+    scan-interval: 1H  # 单位：M/H/D
+    max-file-size: 500MB # 单位：B/KB/MB/GB/TB。默认单位：B。任意大小：-1

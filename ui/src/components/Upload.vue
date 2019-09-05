@@ -19,7 +19,7 @@
           <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
           <div class="el-upload__text">{{$t('msg.upload.dragFile.1')}}<em>{{$t('msg.upload.dragFile.2')}}</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
-          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config"><span v-if="config.share.maxFileSize > 0">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize + 'MB'})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
+          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config"><span v-if="!config.share.maxFileSize.startsWith('-1')">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
         </el-upload>
         <el-row style="margin-top: 5px; line-height: 42px;">
           <span v-if="$i18n.locale == 'en-US'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
@@ -27,7 +27,7 @@
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
               :key="index"
-              :label="item.name"
+              :label="item.value.slice(0, item.value.length-1) + $t('msg.durationUnit.' + item.value.charAt(item.value.length-1))"
               :value="item.value">
             </el-option>
           </el-select>
@@ -111,60 +111,74 @@ export default {
     }
   },
   async created() {
-    console.log(this.$t('msg.language'))
     var loading = this.$loading()
 
-    // 获取后端配置信息
-    await axios.get('/api/config')
-    .then((data) => {
-      this.config = data.data
-      for(var option of this.config.share.ttlOptions) {
-        if(option.defaultOption) {
-          this.ttl = option.value
+    try {
+      // 获取后端配置信息
+      await axios.get('/api/config')
+      .then((data) => {
+        this.config = data.data
+        for(var option of this.config.share.ttlOptions) {
+          if(option.defaultOption) {
+            this.ttl = option.value
+          }
         }
+        if(!this.ttl) {
+          this.ttl = this.config.share.ttlOptions[0].value
+        }
+      }).catch((error) => {
+        // this.$message.error(error.response.data.message ? error.response.data.message : error.toString())
+        this.errorMsg = error.response.data.message || error
+      })
+      if (this.errorMsg) {
+        console.log('return')
+        return
       }
-      if(!this.ttl) {
-        this.ttl = this.config.share.ttlOptions[0].value
+
+      // 获取owner权限
+      var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+      await axios.post('/api/shares/owner/authorize', storedList)
+      .then(() => {
+        this.uploadedList = storedList
+      }).catch((error) => {
+        this.errorMsg = error.response.data.message || error
+      })
+      if (this.errorMsg) {
+        return
       }
-    }).catch((error) => {
-      // this.$message.error(error.response.data.message ? error.response.data.message : error.toString())
-      this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
-    }).finally(() => {
-    })
-
-    // 获取owner权限
-    var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
-    await axios.post('/api/shares/owner/authorize', storedList)
-    .then(() => {
-      this.uploadedList = storedList
-    }).catch((error) => {
-      this.errorMsg = error.response.data.message ? error.response.data.message : error.toString()
-    })
-
-    loading.close()
+    } finally {
+      loading.close()
+    }
   },
   methods: {
     submitUpload() {
-      var fd = new FormData()
+      let fd = new FormData()
       fd.append('ttl', this.ttl)
       if(this.passwordEnabled && this.password) {
         fd.append('password', this.password)
       }
-      for(var file of this.fileList) {
+      let totalSize = 0
+      for(let file of this.fileList) {
+        totalSize += file.size
         fd.append('file', file.raw)
       }
-      axios.post(
-        '/api/shares',
-        fd,
-        {
-          onUploadProgress: this.showProgress
-        }
-      ).then((response) => {
-        this.handleSuccess(response.data)
-      }).catch((error) => {
-        this.handleError(error)
-      })
-      this.isChooseUpload = true
+      let maxSize = this.util.parseDataSize(this.config.share.maxFileSize)
+      if (totalSize < maxSize) {
+        axios.post(
+          '/api/shares',
+          fd,
+          {
+            onUploadProgress: this.showProgress
+          }
+        ).then((response) => {
+          this.handleSuccess(response.data)
+        }).catch((error) => {
+          this.handleError(error)
+        })
+        this.isChooseUpload = true
+      } else {
+        this.$message.error(this.$t('msg.message.fileTooBig', {size: this.config.share.maxFileSize}))
+      }
     },
     onChange(file, fileList) {
       this.fileList = fileList
@@ -180,9 +194,10 @@ export default {
       this.save()
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
-    handleError(err) {
-      // console.log(err)
-      this.$message.error(this.$t('msg.message.uploadFail', {errMsg: err}))
+    handleError(error) {
+      // console.log(error)
+      this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
+      this.errorMsg = error.response.data.message || error
       // var response = JSON.parse(err.message)
       // this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
@@ -211,15 +226,15 @@ export default {
         }
       }
     },
-    chooseUpload(file) {
-      if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
-        this.$message.error(this.$t('msg.message.fileTooBig', {size: this.maxFileSize + 'MB'}))
-        return false
-      }
-      this.isChooseUpload = true
-      this.isChooseDownload = false
-      this.lastLoadTime = new Date().getTime()
-    },
+    // chooseUpload(file) {
+    //   if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
+    //     this.$message.error(this.$t('msg.message.fileTooBig', {size: this.maxFileSize + 'MB'}))
+    //     return false
+    //   }
+    //   this.isChooseUpload = true
+    //   this.isChooseDownload = false
+    //   this.lastLoadTime = new Date().getTime()
+    // },
     onCopySuccess() {
       this.$message.success(this.$t('msg.message.linkCopied'))
     },

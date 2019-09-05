@@ -53,17 +53,18 @@ public class Application implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         for (TtlOption ttl : config.getShare().getTtlOptions()) {
-            logger.debug(ttl.toString());
+            logger.debug("过期时间：" + ttl.toString());
         }
-        logger.debug("扫描间隔：" + config.getShare().getScanInterval() + "小时");
-        logger.debug("最大文件：" + config.getShare().getMaxFileSize() + " MB");
+        logger.debug("扫描间隔：" + config.getShare().getScanInterval());
+        logger.debug("最大文件：" + config.getShare().getMaxFileSize());
     }
 
     @Bean
     public MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
         //  单个数据大小
-        factory.setMaxFileSize(DataSize.ofBytes(new Double(config.getShare().getMaxFileSize() * 1024 * 1024).longValue()));
+//        factory.setMaxFileSize(DataSize.ofBytes(new Double(config.getShare().getMaxFileSize() * 1024 * 1024).longValue()));
+        factory.setMaxFileSize(DataSize.parse(config.getShare().getMaxFileSize()));
         /// 总上传数据大小
         factory.setMaxRequestSize(DataSize.ofBytes(-1));
         return factory.createMultipartConfig();
