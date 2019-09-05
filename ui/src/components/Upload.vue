@@ -131,7 +131,6 @@ export default {
         this.errorMsg = error.response.data.message || error
       })
       if (this.errorMsg) {
-        console.log('return')
         return
       }
 
@@ -195,7 +194,6 @@ export default {
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(error) {
-      // console.log(error)
       this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
       this.errorMsg = error.response.data.message || error
       // var response = JSON.parse(err.message)

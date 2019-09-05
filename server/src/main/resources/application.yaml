@@ -16,14 +16,10 @@ logging:
 sendfile:
   share:
     ttl-options:  # 单位：M/H/D。永不过期：-1
-      - name: 1小时
-        value: 1H
-      - name: 1天
-        value: 1D
+      - value: 1H
+      - value: 1D
         default-option: true
-      - name: 7天
-        value: 7D
-      - name: 30天
-        value: 30D
+      - value: 7D
+      - value: 30D
     scan-interval: 1H  # 单位：M/H/D
     max-file-size: 500MB # 单位：B/KB/MB/GB/TB。默认单位：B。任意大小：-1
