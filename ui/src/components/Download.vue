@@ -2,12 +2,12 @@
   <div>
     <el-card style="width: 560px; min-height: 400px; display: inline-block; margin: 10px;">
       <div style="min-height: 344px;">
-        <div v-if="share" style="min-height: 310px;">
+        <div v-if="share" style="height: 310px;">
           <span>{{ $t('msg.download.title') }}</span>
           <el-divider></el-divider>
           <files :share="share" :on-removed="shareRemoved" style="margin: 0px 50px 0px 50px;"></files>
         </div>
-        <div v-else-if="needPassword" style="min-height: 310px;">
+        <div v-else-if="needPassword" style="height: 310px;">
           <el-row style="height: 70px;"></el-row>
           <el-row>
             <span>{{ $t('msg.download.needPassword') }}</span>
@@ -17,7 +17,7 @@
             <el-button type="primary" @click="authorize">{{ $t('msg.download.unlockButton') }}</el-button>
           </el-row>
         </div>
-        <div v-else style="min-height: 310px; width: 100%; display: table; text-align: center;">
+        <div v-else style="height: 310px; width: 100%; display: table; text-align: center;">
           <p style="font-size: large; vertical-align: middle; display: table-cell;">{{ errorMsg }}</p>
         </div>
         <div style="margin-top: 20px; width: 100%;">
