@@ -26,7 +26,6 @@
 </template>
 
 <script>
-import { format } from 'path';
 export default {
   name: 'app',
   methods: {
