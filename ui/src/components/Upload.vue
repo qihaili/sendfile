@@ -111,14 +111,14 @@ export default {
     }
   },
   async created() {
-    var loading = this.$loading()
+    let loading = this.$loading()
 
     try {
       // 获取后端配置信息
       await axios.get('/api/config')
       .then((data) => {
         this.config = data.data
-        for(var option of this.config.share.ttlOptions) {
+        for(let option of this.config.share.ttlOptions) {
           if(option.defaultOption) {
             this.ttl = option.value
           }
@@ -135,16 +135,22 @@ export default {
       }
 
       // 获取owner权限
-      var storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
-      await axios.post('/api/shares/owner/authorize', storedList)
-      .then(() => {
-        this.uploadedList = storedList
-      }).catch((error) => {
-        // this.errorMsg = error.response.data.message || error
-        this.errorMsg = {
-          msg: 'msg.upload.wrongToken'
-        }
-      })
+      let storedList = localStorage.getItem('uploaded') == null ? [] : JSON.parse(localStorage.getItem('uploaded'))
+      let authorizedShares = []
+      for (let storedShare of storedList) {
+        await axios.post('/api/shares/authorize', storedShare)
+        .then(() => {
+          // this.uploadedList = storedList
+          authorizedShares.push(storedShare)
+        // }).catch((error) => {
+          // this.errorMsg = error.response.data.message || error
+          // this.errorMsg = {
+          //   msg: 'msg.upload.wrongToken'
+          // }
+        })
+      }
+      this.uploadedList = authorizedShares;
+      this.save()
       if (this.errorMsg) {
         return
       }
@@ -199,7 +205,7 @@ export default {
     handleError(error) {
       this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
       this.errorMsg = error.response.data.message || error
-      // var response = JSON.parse(err.message)
+      // let response = JSON.parse(err.message)
       // this.$message.error('上传失败。' + response.message)
       this.uploadStatus = 'exception'
     },
@@ -208,13 +214,13 @@ export default {
       this.uploadPercentage = parseInt(event.loaded*100 / event.total)
 
       // 计算速度
-      var now = new Date().getTime()
-      var perTime = (now - this.lastLoadTime) / 1000  // 秒
+      let now = new Date().getTime()
+      let perTime = (now - this.lastLoadTime) / 1000  // 秒
       if(perTime > 1) {
-        var perLoad = event.loaded - this.lastLoaded
+        let perLoad = event.loaded - this.lastLoaded
         this.lastLoaded = event.loaded
         this.lastLoadTime = now
-        var speed = perLoad / perTime
+        let speed = perLoad / perTime
 
         if(speed > 1024*1024*1024) { // GB
           this.speed = (speed / (1024*1024*1024)).toFixed(1) + ' GB/s'
@@ -250,10 +256,10 @@ export default {
       // this.isChooseDownload = true
     },
     shareRemoved(share) {
-      // var index = this.uploadedList.indexOf(share)
-      var index = -1
-      for(var i=0; i<this.uploadedList.length; i++) {
-        var uploadedShare = this.uploadedList[i]
+      // let index = this.uploadedList.indexOf(share)
+      let index = -1
+      for(let i=0; i<this.uploadedList.length; i++) {
+        let uploadedShare = this.uploadedList[i]
         if(uploadedShare.id == share.id) {
           index = i
           break
@@ -265,8 +271,8 @@ export default {
       }
     },
     save() {
-      var saveList = JSON.parse(JSON.stringify(this.uploadedList))
-      for(var share of saveList) {
+      let saveList = JSON.parse(JSON.stringify(this.uploadedList))
+      for(let share of saveList) {
         share.ttl = null
       }
       localStorage.setItem('uploaded', JSON.stringify(saveList))

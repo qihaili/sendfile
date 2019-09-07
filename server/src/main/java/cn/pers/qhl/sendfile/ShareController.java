@@ -129,39 +129,46 @@ public class ShareController {
         }
     }
 
-    @PostMapping("viewer/authorize")
-    void authorizeViewer(@RequestBody ShareWithPassword[] shareWithPasswords) {
-        for (ShareWithPassword share : shareWithPasswords) {
-            if (shareService.getShare(share.getId()).getPassword().equals(share.getPassword())) {
-                getCanReadShares().add(share.getId());
-            } else {
-                throw new UnauthorizedException();
-            }
-        }
-//        ShareInfo shareInfo = shareService.getShare(shareId);
-//        if (shareInfo.getPassword() != null) {
-//            if (shareInfo.getPassword().equals(authenticateInfo.getPassword())) {
-//                getCanReadShares(session).add(shareId);
+//    @PostMapping("viewer/authorize")
+//    void authorizeViewer(@RequestBody ShareWithPassword[] shareWithPasswords) {
+//        for (ShareWithPassword share : shareWithPasswords) {
+//            if (shareService.getShare(share.getId()).getPassword().equals(share.getPassword())) {
+//                getCanReadShares().add(share.getId());
 //            } else {
 //                throw new UnauthorizedException();
 //            }
-//        } else {
-//            throw new BadRequestException("该共享无需验证");
 //        }
-    }
+//    }
+//
+//    @PostMapping("owner/authorize")
+//    void authorizeOwner(@RequestBody ShareWithToken[] shareTokens) {
+//        for (ShareWithToken share : shareTokens) {
+//            String shareId = share.getId();
+//            if (!StringUtils.isEmpty(shareId)) {
+//                ShareInfo shareInfo = shareService.getShare(shareId);
+//                if (shareInfo != null) {
+//                    if (shareInfo.getToken().equals(share.getToken())) {
+//                        getOwnShares().add(shareId);
+//                    } else {
+//                        throw new UnauthorizedException();
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    @PostMapping("owner/authorize")
-    void authorizeOwner(@RequestBody ShareWithToken[] shareTokens) {
-        for (ShareWithToken share : shareTokens) {
-            String shareId = share.getId();
-            if (!StringUtils.isEmpty(shareId)) {
-                ShareInfo shareInfo = shareService.getShare(shareId);
-                if (shareInfo != null) {
-                    if (shareInfo.getToken().equals(share.getToken())) {
-                        getOwnShares().add(shareId);
-                    } else {
-                        throw new UnauthorizedException();
-                    }
+    @PostMapping("authorize")
+    void authorize(@RequestBody ShareCredential share) {
+        String shareId = share.getId();
+        if (!StringUtils.isEmpty(shareId)) {
+            ShareInfo shareInfo = shareService.getShare(shareId);
+            if (shareInfo != null) {
+                if (shareInfo.getToken().equals(share.getToken())) {
+                    getOwnShares().add(shareId);
+                } else if (shareInfo.getPassword().equals(share.getPassword())) {
+                    getCanReadShares().add(shareId);
+                } else {
+                    throw new UnauthorizedException();
                 }
             }
         }

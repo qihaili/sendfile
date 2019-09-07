@@ -52,11 +52,11 @@ export default {
     },
     authorize() {
       axios.post(
-        '/api/shares/viewer/authorize',
-        [{
+        '/api/shares/authorize',
+        {
           id: this.$route.params.shareId,
           password: this.password
-        }]
+        }
       ).then(() => {
         this.getShare()
       }).catch((error) => {
@@ -68,7 +68,7 @@ export default {
       })
     },
     getShare() {
-      var loading = this.$loading()
+      let loading = this.$loading()
       axios.get(
         `/api/shares/${this.$route.params.shareId}`, {
           // headers: {
@@ -82,7 +82,7 @@ export default {
         if (error.response.data.status == 401) {
           this.needPassword = true
         } else {
-          this.errorMsg = error.response.data.message ? error.response.data.message : error
+          this.errorMsg = error.response.data.message || error
         }
       }).finally(() => {
           loading.close()

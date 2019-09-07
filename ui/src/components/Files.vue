@@ -115,7 +115,7 @@ export default {
       })
     },
     humanReadableDataSize(size) {
-      var humanReadable
+      let humanReadable
       if(size > 1024*1024*1024*1024) {
         humanReadable = (size / (1024*1024*1024*1024)).toFixed(1) + 'TB'
       } else if(size > 1024*1024*1024) { // GB
