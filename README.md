@@ -1,24 +1,26 @@
 # sendfile
 
-#### 介绍
-一个用于临时分享文件的服务器。上传文件，并把链接发送给朋友。上传者可设置分享过期时间、密码、或主动删除文件。
+[中文版](./README.zh-CN.md)
 
-#### 软件架构
+#### Description
+A file share server. Upload files and send link to friends. Uploader can set expire time, password, or delete files.
 
-* 前端：Vue + Element UI
-* 后端：Springboot
+#### Software Architecture
 
-#### 安装教程
+* Front end: Vue + Element UI
+* Back end: Springboot
 
-1. 依赖环境：Java 1.8
-1. 到Release页面下载jar文件
-2. 运行：java -jar sendfile-x.y.z.jar
+#### Installation
 
-#### 使用说明
+1. Prerequisites：Java 1.8
+1. Go to Release page to download jar file
+2. Run command: java -jar sendfile-x.y.z.jar
 
-1. 在浏览器打开：http://localhost:30080
-2. 添加一至多个文件
-3. 点击“上传”按钮
-4. 等待上传结束
-5. 复制分享地址
-6. 发给朋友
+#### Instructions
+
+1. Open url in browser: http://localhost:30080
+2. Add one or more files
+3. Click Upload button
+4. Wait for upload
+5. Copy share url
+6. Send to friends

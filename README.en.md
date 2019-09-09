@@ -1,5 +1,7 @@
 # sendfile
 
+[中文版](./README.zh-CN.md)
+
 #### Description
 A file share server. Upload files and send link to friends. Uploader can set expire time, password, or delete files.
 
