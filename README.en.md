@@ -13,8 +13,8 @@ A file share server. Upload files and send link to friends. Uploader can set exp
 #### Installation
 
 1. Prerequisites：Java 1.8
-1. Go to Release page to download jar file
-2. Run command: java -jar sendfile-x.y.z.jar
+1. Go to [release page](https://github.com/qihaili/sendfile/releases) to download the lates release jar file
+1. Run command: java -jar sendfile-x.y.z.jar
 
 #### Instructions
 

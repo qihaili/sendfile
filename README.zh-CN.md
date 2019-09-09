@@ -13,7 +13,7 @@
 #### 安装教程
 
 1. 依赖环境：Java 1.8
-1. 到Release页面下载jar文件
+1. 到[Release页面](https://github.com/qihaili/sendfile/releases)下载最新的jar文件
 2. 运行：java -jar sendfile-x.y.z.jar
 
 #### 使用说明
