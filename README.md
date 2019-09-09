@@ -1,39 +1,24 @@
 # sendfile
 
 #### 介绍
-{**以下是码云平台说明，您可以替换此简介**
-码云是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用码云实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+一个用于临时分享文件的服务器。上传文件，并把链接发送给朋友。上传者可设置分享过期时间、密码、或主动删除文件。
 
 #### 软件架构
-软件架构说明
 
+* 前端：Vue + Element UI
+* 后端：Springboot
 
 #### 安装教程
 
-1. xxxx
-2. xxxx
-3. xxxx
+1. 依赖环境：Java 1.8
+1. 到Release页面下载jar文件
+2. 运行：java -jar sendfile-x.y.z.jar
 
 #### 使用说明
 
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1. 在浏览器打开：http://localhost:30080
+2. 添加一至多个文件
+3. 点击“上传”按钮
+4. 等待上传结束
+5. 复制分享地址
+6. 发给朋友
