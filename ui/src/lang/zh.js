@@ -12,6 +12,7 @@ export const msg = {
     expire: '后过期',
     enablePassword: '密码保护',
     uploadButton: '上传',
+    cancel: '取消',
     wrongToken: 'Token验证错误'
   },
   uploaded: {

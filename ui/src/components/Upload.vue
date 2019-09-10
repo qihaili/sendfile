@@ -8,6 +8,7 @@
         <div style="text-align: left; width: 358px; margin: auto;">
         <el-upload
           drag
+          ref="upload"
           action=""
           :show-file-list="true"
           :auto-upload="false"
@@ -62,6 +63,9 @@
         </div>
         <div v-else style="margin: 50px 5px">
           <span>{{$t('msg.message.uploading')}}</span>
+          <el-row>
+            <el-button @click="cancelUpload" style="margin-top: 20px;">{{$t('msg.upload.cancel')}}</el-button>
+          </el-row>
         </div>
       </div>
     </el-card>
@@ -102,7 +106,8 @@ export default {
       passwordEnabled: false,
       password: null,
       showPassword: false,
-      errorMsg: null
+      errorMsg: null,
+      cancelToken: null
     }
   },
   computed: {
@@ -172,11 +177,13 @@ export default {
       }
       let maxSize = this.util.parseDataSize(this.config.share.maxFileSize)
       if (totalSize < maxSize) {
+        this.cancelToken = axios.CancelToken.source();
         axios.post(
           '/api/shares',
           fd,
           {
-            onUploadProgress: this.showProgress
+            onUploadProgress: this.showProgress,
+            cancelToken: this.cancelToken.token
           }
         ).then((response) => {
           this.handleSuccess(response.data)
@@ -186,6 +193,11 @@ export default {
         this.isChooseUpload = true
       } else {
         this.$message.error(this.$t('msg.message.fileTooBig', {size: this.config.share.maxFileSize}))
+      }
+    },
+    cancelUpload() {
+      if (this.cancelToken) {
+        this.cancelToken.cancel()
       }
     },
     onChange(file, fileList) {
@@ -203,11 +215,15 @@ export default {
       // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(error) {
-      this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
-      this.errorMsg = error.response.data.message || error
-      // let response = JSON.parse(err.message)
-      // this.$message.error('上传失败。' + response.message)
-      this.uploadStatus = 'exception'
+      if (axios.isCancel(error)) {
+        this.backToHome()
+      } else {
+        this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
+        this.errorMsg = error.response.data.message || error
+        // let response = JSON.parse(err.message)
+        // this.$message.error('上传失败。' + response.message)
+        this.uploadStatus = 'exception'
+      }
     },
     showProgress(event) {
       // this.uploadPercentage = Number(event.percent.toFixed(0))
