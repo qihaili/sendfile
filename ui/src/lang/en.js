@@ -12,7 +12,7 @@ export const msg = {
     expire: 'Expires after',
     enablePassword: 'Enable password',
     uploadButton: 'Upload',
-    wrongToken: 'Token authorization failed'
+    cancel: 'Cancel'
   },
   uploaded: {
     downloadLink: 'Download link：',
