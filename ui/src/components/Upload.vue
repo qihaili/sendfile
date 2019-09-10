@@ -1,8 +1,13 @@
 <template>
   <div>
     <el-card class="mycard">
-      <div v-if="errorMsg" style="height: 310px; width: 100%; display: table; text-align: center;">
-        <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
+      <div v-if="errorMsg">
+        <el-row style="height: 450px; width: 100%; display: table; text-align: center;">
+          <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
+        </el-row>
+        <el-row style="text-align: center; width: 100%;">
+          <el-link type="primary" icon="el-icon-s-home" @click="backToHome">{{$t('msg.uploaded.backToHomeLink')}}</el-link>
+        </el-row>
       </div>
       <div v-else-if="!isChooseUpload">
         <div style="text-align: left; width: 358px; margin: auto;">
@@ -132,7 +137,6 @@ export default {
           this.ttl = this.config.share.ttlOptions[0].value
         }
       }).catch((error) => {
-        // this.$message.error(error.response.data.message ? error.response.data.message : error.toString())
         this.errorMsg = error.response.data.message || error
       })
       if (this.errorMsg) {
@@ -145,13 +149,7 @@ export default {
       for (let storedShare of storedList) {
         await axios.post('/api/shares/authorize', storedShare)
         .then(() => {
-          // this.uploadedList = storedList
           authorizedShares.push(storedShare)
-        // }).catch((error) => {
-          // this.errorMsg = error.response.data.message || error
-          // this.errorMsg = {
-          //   msg: 'msg.upload.wrongToken'
-          // }
         })
       }
       this.uploadedList = authorizedShares;
@@ -209,10 +207,8 @@ export default {
       this.share = response
       this.uploadStatus = 'success'
       this.speed = null
-      // this.share.ttl = null
       this.uploadedList.unshift(this.share)
       this.save()
-      // localStorage.setItem('uploaded', JSON.stringify(this.uploadedList))
     },
     handleError(error) {
       if (axios.isCancel(error)) {
@@ -220,13 +216,10 @@ export default {
       } else {
         this.$message.error(this.$t('msg.message.uploadFail', {errMsg: error.response.data.message || error}))
         this.errorMsg = error.response.data.message || error
-        // let response = JSON.parse(err.message)
-        // this.$message.error('上传失败。' + response.message)
         this.uploadStatus = 'exception'
       }
     },
     showProgress(event) {
-      // this.uploadPercentage = Number(event.percent.toFixed(0))
       this.uploadPercentage = parseInt(event.loaded*100 / event.total)
 
       // 计算速度
@@ -249,15 +242,6 @@ export default {
         }
       }
     },
-    // chooseUpload(file) {
-    //   if (this.maxFileSize > 0 && file.size > this.maxFileSize * 1024 * 1024) {
-    //     this.$message.error(this.$t('msg.message.fileTooBig', {size: this.maxFileSize + 'MB'}))
-    //     return false
-    //   }
-    //   this.isChooseUpload = true
-    //   this.isChooseDownload = false
-    //   this.lastLoadTime = new Date().getTime()
-    // },
     onCopySuccess() {
       this.$message.success(this.$t('msg.message.linkCopied'))
     },
@@ -269,10 +253,8 @@ export default {
       this.fileList = null
       this.passwordEnabled = false
       this.password = null
-      // this.isChooseDownload = true
     },
     shareRemoved(share) {
-      // let index = this.uploadedList.indexOf(share)
       let index = -1
       for(let i=0; i<this.uploadedList.length; i++) {
         let uploadedShare = this.uploadedList[i]
