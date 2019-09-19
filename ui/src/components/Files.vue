@@ -1,14 +1,33 @@
 <template>
   <div>
-    <el-row v-for="(file, index) in share.files" :key="index">
-      <div style="display: inline-block; float: left;">
-        <!-- <el-link :href="'/api/files/' + share.id + '/' + file.name" :underline="false" style="vertical-align: middle; font-size: 16px;" icon="el-icon-document"><p style="width: 280px; margin: 0px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 14px;">{{ file.name }}</p></el-link> -->
-        <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; font-size: large; margin: 0px;" icon="el-icon-document"><div style="max-width: 340px; text-align: left; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">{{ file.name }}</div></el-link></el-tooltip>
-      </div>
-      <div style="display: inline-block; float: right;">
-        <span style="vertical-align: middle; font-size: small;">{{ humanReadableDataSize(file.size) }}</span>
-      </div>
-    </el-row>
+    <table v-if="share.files" style="width: 100%;">
+      <tr v-for="(file, index) in share.files" :key="index">
+        <td width="20">
+          <i class="el-icon-document" style="vertical-align: middle;"/>
+        </td>
+        <td min-width="200" align="left">
+          <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; margin: 0px;"><div style="text-align: left; word-break: break-all;">{{ file.name }}</div></el-link></el-tooltip>
+        </td>
+        <td width="55" align="right">
+          <span style="vertical-align: middle; font-size: small;">{{ humanReadableDataSize(file.size) }}</span>
+        </td>
+      </tr>
+    </table>
+    <!-- <el-table :data="share.files" v-if="share.files" style="width: 100%;" :show-header="false" size="mini">
+      <el-table-column width="35">
+        <i class="el-icon-document" style="vertical-align: middle;"/>
+      </el-table-column>
+      <el-table-column>
+        <template min-width="200" slot-scope="file">
+          <el-tooltip :content="file.row.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.row.name" style="vertical-align: middle; margin: 0px;"><div style="text-align: left; word-break: break-all;">{{ file.row.name }}</div></el-link></el-tooltip>
+        </template>
+      </el-table-column>
+      <el-table-column width="80" align="right">
+        <template slot-scope="file">
+          <span style="vertical-align: middle; font-size: small;">{{ humanReadableDataSize(file.row.size) }}</span>
+        </template>
+      </el-table-column>
+    </el-table> -->
     <div style="margin: 10px 0px" class="el-divider el-divider--horizontal"></div>
     <el-row>
       <div style="display: inline-block; float: left; text-align: left;">

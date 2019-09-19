@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-card style="width: 560px; min-height: 400px; display: inline-block; margin: 10px;">
+    <el-card style="max-width: 700px; min-width: 400px; min-height: 400px; display: inline-block; margin: 10px;">
       <div style="min-height: 344px;">
         <div v-if="share" style="height: 310px;">
           <span>{{ $t('msg.download.title') }}</span>
           <el-divider></el-divider>
-          <files :share="share" :on-removed="shareRemoved" style="margin: 0px 50px 0px 50px;"></files>
+          <files :share="share" :on-removed="shareRemoved" style="margin: 0px 20px 0px 20px;"></files>
         </div>
         <div v-else-if="needPassword" style="height: 310px;">
           <el-row style="height: 70px;"></el-row>

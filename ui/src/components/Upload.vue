@@ -9,8 +9,8 @@
           <el-link type="primary" icon="el-icon-s-home" @click="backToHome">{{$t('msg.uploaded.backToHomeLink')}}</el-link>
         </el-row>
       </div>
-      <div v-else-if="!isChooseUpload">
-        <div style="text-align: left; width: 358px; margin: auto;">
+      <div v-else-if="!isChooseUpload" style="text-align: left; max-width: 358px; margin: auto;">
+        <!-- <div style="text-align: left; max-width: 358px; margin: auto;"> -->
         <el-upload
           drag
           ref="upload"
@@ -25,7 +25,7 @@
           <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
           <div class="el-upload__text">{{$t('msg.upload.dragFile.1')}}<em>{{$t('msg.upload.dragFile.2')}}</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
-          <div class="el-upload__tip" slot="tip" style="text-align: center;" v-if="config"><span v-if="!config.share.maxFileSize.startsWith('-1')">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
+          <div slot="tip" class="el-upload__tip" style="text-align: center;" v-if="config"><span v-if="!config.share.maxFileSize.startsWith('-1')">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
         </el-upload>
         <el-row style="margin-top: 5px; line-height: 42px;">
           <span v-if="$i18n.locale == 'en-US'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
@@ -45,7 +45,7 @@
           <!-- <el-input v-model="password" style="width: 300px; margin-right: 10px;" @keyup.enter.native="authorize" autofocus :type="showPassword ? 'text' : 'password'"><i slot="suffix" :class="'el-input__icon iconfont ' + (showPassword ? 'icon-eye-open' : 'icon-eye-close')" style="cursor: pointer;" @click="showPassword = !showPassword"></i></el-input> -->
         </el-row>
         <el-button type="primary" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null || fileList.length == 0" style="width: 100%; margin-top: 10px;">{{$t('msg.upload.uploadButton')}}</el-button>
-        </div>
+        <!-- </div> -->
       </div>
       <div v-else>
         <el-progress type="circle" :stroke-width="18" :percentage="uploadPercentage" :status="uploadStatus" style="margin-top: 20px;"/>
