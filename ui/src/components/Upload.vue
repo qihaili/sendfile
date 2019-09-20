@@ -19,7 +19,7 @@
           :auto-upload="false"
           :multiple="true"
           :on-change="onChange"
-          style="text-align: left; min-height: 310px;"
+          style="text-align: left; min-height: 15rem;"
           >
           <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
           <i class="el-icon-circle-plus" style="font-size: 3.7rem; color: #C0C4CC; margin: 2rem 0 1.5rem; line-height: 50px;"></i>
@@ -296,7 +296,7 @@ export default {
   .mycard2-upload {
     /* max-width: 440px; */
     min-height: 500px;
-    width: 600px;
+    width: 580px;
     /* height: 450px; */
     margin: 10px;
     display: inline-block;
@@ -313,7 +313,7 @@ export default {
   .mycard2 {
     /* max-width: 440px; */
     min-height: 500px;
-    width: 600px;
+    width: 580px;
     /* height: 450px; */
     margin: 10px;
     display: inline-block;
@@ -323,11 +323,11 @@ export default {
     padding: 20px;
   }
 }
-@media (min-width: 580px) and (max-width: 1300px) {
+@media (min-width: 650px) and (max-width: 1300px) {
   .mycard2-upload {
     /* max-width: 440px; */
     min-height: 500px;
-    width: 440px;
+    width: 430px;
     /* height: 450px; */
     margin: 10px;
     display: inline-block;
@@ -344,7 +344,7 @@ export default {
   .mycard2 {
     /* max-width: 440px; */
     min-height: 500px;
-    width: 440px;
+    width: 430px;
     /* height: 450px; */
     margin: 10px;
     display: inline-block;
@@ -354,19 +354,19 @@ export default {
     padding: 20px;
   }
 }
-@media (max-width: 580px) {
+@media (max-width: 650px) {
   .hello {
     background-color: red
   }
   .mycard2-upload {
     /* max-width: 440px; */
-    min-height: 450px;
+    min-height: 410px;
     min-width: 280px;
     /* width: 100%; */
     /* height: 450px; */
     margin-bottom: 10px;
     /* display: inline-block; */
-    vertical-align: top;
+    /* vertical-align: top; */
     border: 1px solid #EBEEF5;
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
     padding: 10px;
@@ -382,13 +382,13 @@ export default {
   }
   .mycard2 {
     /* max-width: 440px; */
-    min-height: 500px;
+    /* min-height: 500px; */
     min-width: 302px;
     /* width: 500px; */
     /* height: 450px; */
     /* margin: 10px; */
     /* display: inline-block; */
-    vertical-align: top;
+    /* vertical-align: top; */
   }
 }
 </style>
