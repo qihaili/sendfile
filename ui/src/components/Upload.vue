@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-card class="mycard">
+    <div class="mycard2-upload">
       <div v-if="errorMsg">
         <el-row style="height: 450px; width: 100%; display: table; text-align: center;">
           <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
@@ -9,7 +9,7 @@
           <el-link type="primary" icon="el-icon-s-home" @click="backToHome">{{$t('msg.uploaded.backToHomeLink')}}</el-link>
         </el-row>
       </div>
-      <div v-else-if="!isChooseUpload" style="text-align: left; max-width: 358px; margin: auto;">
+      <div v-else-if="!isChooseUpload" class="upload-panel">
         <!-- <div style="text-align: left; max-width: 358px; margin: auto;"> -->
         <el-upload
           drag
@@ -22,13 +22,13 @@
           style="text-align: left; min-height: 310px;"
           >
           <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
-          <i class="el-icon-circle-plus" style="font-size: 67px; color: #C0C4CC; margin: 40px 0 16px; line-height: 50px;"></i>
-          <div class="el-upload__text">{{$t('msg.upload.dragFile.1')}}<em>{{$t('msg.upload.dragFile.2')}}</em></div>
+          <i class="el-icon-circle-plus" style="font-size: 3.7rem; color: #C0C4CC; margin: 2rem 0 1.5rem; line-height: 50px;"></i>
+          <div class="el-upload__text" style="font-size: 1rem;">{{$t('msg.upload.dragFile.1')}}<em>{{$t('msg.upload.dragFile.2')}}</em></div>
           <!-- <el-button type="success" icon="el-icon-upload" @click="submitUpload" :disabled="fileList === null" style="margin-left: 50px">上传</el-button> -->
           <div slot="tip" class="el-upload__tip" style="text-align: center;" v-if="config"><span v-if="!config.share.maxFileSize.startsWith('-1')">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
         </el-upload>
         <el-row style="margin-top: 5px; line-height: 42px;">
-          <span v-if="$i18n.locale == 'en-US'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
+          <span v-if="$i18n.locale == 'en-US'" style="color: #606266; font-size: 16px;">{{$t('msg.upload.expire')}}</span>
           <el-select v-if="config" v-model="ttl" style="width: 150px; margin: 0px 10px 0px 10px;">
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
@@ -37,7 +37,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <span v-if="$i18n.locale == 'zh-CN'" style="color: #606266;">{{$t('msg.upload.expire')}}</span>
+          <span v-if="$i18n.locale == 'zh-CN'" style="color: #606266; font-size: 16px;">{{$t('msg.upload.expire')}}</span>
         </el-row>
         <el-row style="margin-top: 5px; line-height: 42px;">
           <el-checkbox v-model="passwordEnabled">{{$t('msg.upload.enablePassword')}}</el-checkbox>
@@ -73,15 +73,15 @@
           </el-row>
         </div>
       </div>
-    </el-card>
+    </div>
     <transition>
-      <el-card class="mycard" v-if="uploadedList && uploadedList.length > 0">
+      <div class="mycard2" v-if="uploadedList && uploadedList.length > 0">
         <transition-group name="list">
-          <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px;">
+          <el-card v-for="uploadedShare in uploadedList" :key="uploadedShare.id" style="margin: 10px 0px; box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);">
             <files :share="uploadedShare" :on-removed="shareRemoved"></files>
           </el-card>
         </transition-group>
-      </el-card>
+      </div>
     </transition>
   </div>
 </template>
@@ -291,5 +291,104 @@ export default {
 .list-enter, .list-leave-to {
   opacity: 0;
   transform: translateX(-30px);
+}
+@media (min-width: 1300px) {
+  .mycard2-upload {
+    /* max-width: 440px; */
+    min-height: 500px;
+    width: 600px;
+    /* height: 450px; */
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .upload-panel {
+    text-align: left;
+    max-width: 358px;
+    margin: auto;
+  }
+  .mycard2 {
+    /* max-width: 440px; */
+    min-height: 500px;
+    width: 600px;
+    /* height: 450px; */
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+}
+@media (min-width: 580px) and (max-width: 1300px) {
+  .mycard2-upload {
+    /* max-width: 440px; */
+    min-height: 500px;
+    width: 440px;
+    /* height: 450px; */
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .upload-panel {
+    text-align: left;
+    max-width: 358px;
+    margin: auto;
+  }
+  .mycard2 {
+    /* max-width: 440px; */
+    min-height: 500px;
+    width: 440px;
+    /* height: 450px; */
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+}
+@media (max-width: 580px) {
+  .hello {
+    background-color: red
+  }
+  .mycard2-upload {
+    /* max-width: 440px; */
+    min-height: 450px;
+    min-width: 280px;
+    /* width: 100%; */
+    /* height: 450px; */
+    margin-bottom: 10px;
+    /* display: inline-block; */
+    vertical-align: top;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+  .mycard2-upload .el-upload-dragger {
+    width:280px;
+    height:140px;
+  }
+  .upload-panel {
+    text-align: left;
+    max-width: 280px;
+    margin: auto;
+  }
+  .mycard2 {
+    /* max-width: 440px; */
+    min-height: 500px;
+    min-width: 302px;
+    /* width: 500px; */
+    /* height: 450px; */
+    /* margin: 10px; */
+    /* display: inline-block; */
+    vertical-align: top;
+  }
 }
 </style>

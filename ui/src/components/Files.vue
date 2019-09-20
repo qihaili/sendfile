@@ -6,10 +6,10 @@
           <i class="el-icon-document" style="vertical-align: middle;"/>
         </td>
         <td min-width="200" align="left">
-          <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; margin: 0px;"><div style="text-align: left; word-break: break-all;">{{ file.name }}</div></el-link></el-tooltip>
+          <el-tooltip :content="file.name" placement="top"><el-link :href="'/api/shares/' + share.id + '/' + file.name" style="vertical-align: middle; margin: 0px; font-size: 1rem"><div style="text-align: left; word-break: break-all;">{{ file.name }}</div></el-link></el-tooltip>
         </td>
         <td width="55" align="right">
-          <span style="vertical-align: middle; font-size: small;">{{ humanReadableDataSize(file.size) }}</span>
+          <span style="vertical-align: middle; font-size: 0.8rem;">{{ humanReadableDataSize(file.size) }}</span>
         </td>
       </tr>
     </table>
@@ -35,7 +35,7 @@
         <!-- <el-row><span style="vertical-align: middle; font-size: small;"><span v-if="share.ttl">{{$t('msg.expireTip.normal', {ttl: this.util.humanreadableDuration(share.ttl)})}}</span><span v-else>{{$t('msg.expireTip.neverExpire')}}</span></span></el-row> -->
         <!-- <el-row><span style="vertical-align: middle; font-size: small;">{{$t('msg.humanReadableDuration', {day: this.util.getDuration(share.ttl).day, hour: this.util.getDuration(share.ttl).hour, minute: this.util.getDuration(share.ttl).minute})}}</span></el-row> -->
         <!-- <el-row><span style="vertical-align: middle; font-size: small;"><i18n path="msg.humanReadableDuration" tag="span"><div slot="duration">{{duration.day}}</div></i18n></span></el-row> -->
-        <el-row><span style="vertical-align: middle; font-size: small;"><humanReadableDuration :ttl="this.share.ttl"/></span></el-row>
+        <el-row><span style="vertical-align: middle; font-size: 0.8rem;"><humanReadableDuration :ttl="this.share.ttl"/></span></el-row>
       </div>
       <div style="display: inline-block; float: right;">
         <el-tooltip :content="$t('msg.files.copyLink')" placement="top"><el-button size="mini" v-clipboard:copy="address" v-clipboard:success="onCopySuccess" icon="el-icon-document-copy"></el-button></el-tooltip>

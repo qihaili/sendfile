@@ -45,4 +45,19 @@ export default {
   color: #2c3e50;
   margin-top: 30px;
 }
+@media (min-width: 1300px) {
+  html {
+    font-size: 18px;
+  }
+}
+@media (min-width: 580px) and (max-width: 1300px) {
+  html {
+    font-size: 18px;
+  }
+}
+@media (max-width: 580px) {
+  html {
+    font-size: 14px;
+  }
+}
 </style>
