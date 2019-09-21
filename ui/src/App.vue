@@ -42,6 +42,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 1rem;
+  min-width: 300px;
 }
 @media (min-width: 1300px) {
   html {
@@ -50,12 +51,12 @@ export default {
 }
 @media (min-width: 650px) and (max-width: 1300px) {
   html {
-    font-size: 20px;
+    font-size: 16px;
   }
 }
 @media (max-width: 650px) {
   html {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 </style>

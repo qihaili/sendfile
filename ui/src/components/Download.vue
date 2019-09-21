@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-card style="max-width: 700px; min-width: 400px; min-height: 400px; display: inline-block; margin: 10px;">
-      <div style="min-height: 344px;">
+    <div class="mycard2-download">
+      <!-- <div style="min-height: 344px;"> -->
         <div v-if="share" style="height: 310px;">
           <span>{{ $t('msg.download.title') }}</span>
           <el-divider></el-divider>
-          <files :share="share" :on-removed="shareRemoved" style="margin: 0px 20px 0px 20px;"></files>
+          <files :share="share" :on-removed="shareRemoved" class="files"></files>
         </div>
         <div v-else-if="needPassword" style="height: 310px;">
           <el-row style="height: 70px;"></el-row>
@@ -24,7 +24,7 @@
           <el-link type="primary" @click="gotoUpload">{{ $t('msg.download.gotoUploadLink') }}</el-link>
         </div>
       </div>
-    </el-card>
+    <!-- </div> -->
   </div>
 </template>
 <script>
@@ -96,3 +96,53 @@ export default {
   }
 }
 </script>
+<style>
+@media (min-width: 1301px) {
+  .mycard2-download {
+    max-width: 1000px;
+    width: 100%;
+    min-width: 280px;
+    min-height: 400px;
+    display: inline-block;
+    margin: auto;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .files {
+    margin: 0px 30px;
+  }
+}
+@media (min-width: 501px) and (max-width: 1300px) {
+  .mycard2-download {
+    max-width: 650px;
+    /* width: 100%; */
+    min-width: 280px;
+    min-height: 400px;
+    /* display: inline-block; */
+    margin: auto;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    padding: 20px;
+  }
+  .files {
+    margin: 0px 20px;
+  }
+}
+@media (max-width: 500px) {
+  .mycard2-download {
+    max-width: 500px;
+    min-width: 280px;
+    min-height: 400px;
+    /* display: inline-block; */
+    /* margin: 10px 0; */
+    margin: auto;
+    border: 1px solid #EBEEF5;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.1);
+    padding: 10px;
+  }
+  .files {
+    margin: 0px 10px;
+  }
+}
+</style>

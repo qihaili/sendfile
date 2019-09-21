@@ -19,7 +19,7 @@
           :auto-upload="false"
           :multiple="true"
           :on-change="onChange"
-          style="text-align: left; min-height: 15rem;"
+          class="upload-component"
           >
           <!-- <el-button slot="trigger" type="primary" icon="el-icon-circle-plus">添加文件</el-button> -->
           <i class="el-icon-circle-plus" style="font-size: 3.7rem; color: #C0C4CC; margin: 2rem 0 1.5rem; line-height: 50px;"></i>
@@ -28,7 +28,7 @@
           <div slot="tip" class="el-upload__tip" style="text-align: center;" v-if="config"><span v-if="!config.share.maxFileSize.startsWith('-1')">{{$t('msg.upload.tip.normal',{size:this.config.share.maxFileSize})}}</span><span v-else>{{$t('msg.upload.tip.anySize')}}</span></div>
         </el-upload>
         <el-row style="margin-top: 5px; line-height: 42px;">
-          <span v-if="$i18n.locale == 'en-US'" style="color: #606266; font-size: 16px;">{{$t('msg.upload.expire')}}</span>
+          <span v-if="$i18n.locale == 'en-US'" style="color: #606266; font-size: medium;">{{$t('msg.upload.expire')}}</span>
           <el-select v-if="config" v-model="ttl" style="width: 150px; margin: 0px 10px 0px 10px;">
             <el-option
               v-for="(item, index) in config.share.ttlOptions"
@@ -37,7 +37,7 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <span v-if="$i18n.locale == 'zh-CN'" style="color: #606266; font-size: 16px;">{{$t('msg.upload.expire')}}</span>
+          <span v-if="$i18n.locale == 'zh-CN'" style="color: #606266; font-size: medium;">{{$t('msg.upload.expire')}}</span>
         </el-row>
         <el-row style="margin-top: 5px; line-height: 42px;">
           <el-checkbox v-model="passwordEnabled">{{$t('msg.upload.enablePassword')}}</el-checkbox>
@@ -292,7 +292,7 @@ export default {
   opacity: 0;
   transform: translateX(-30px);
 }
-@media (min-width: 1300px) {
+@media (min-width: 1301px) {
   .mycard2-upload {
     /* max-width: 440px; */
     min-height: 500px;
@@ -310,6 +310,9 @@ export default {
     max-width: 358px;
     margin: auto;
   }
+  .upload-component {
+    min-height: 340px;
+  }
   .mycard2 {
     /* max-width: 440px; */
     min-height: 500px;
@@ -323,7 +326,7 @@ export default {
     padding: 20px;
   }
 }
-@media (min-width: 650px) and (max-width: 1300px) {
+@media (min-width: 501px) and (max-width: 1300px) {
   .mycard2-upload {
     /* max-width: 440px; */
     min-height: 500px;
@@ -341,6 +344,9 @@ export default {
     max-width: 358px;
     margin: auto;
   }
+  .upload-component {
+    min-height: 340px;
+  }
   .mycard2 {
     /* max-width: 440px; */
     min-height: 500px;
@@ -354,7 +360,7 @@ export default {
     padding: 20px;
   }
 }
-@media (max-width: 650px) {
+@media (max-width: 500px) {
   .hello {
     background-color: red
   }
@@ -362,6 +368,7 @@ export default {
     /* max-width: 440px; */
     min-height: 410px;
     min-width: 280px;
+    /* max-width: 442px; */
     /* width: 100%; */
     /* height: 450px; */
     margin-bottom: 10px;
@@ -378,12 +385,18 @@ export default {
   .upload-panel {
     text-align: left;
     max-width: 280px;
+    /* width: 100%; */
     margin: auto;
+  }
+  .upload-component {
+    min-height: 250px;
   }
   .mycard2 {
     /* max-width: 440px; */
     /* min-height: 500px; */
     min-width: 302px;
+    /* max-width: 442px; */
+    /* width: 100%; */
     /* width: 500px; */
     /* height: 450px; */
     /* margin: 10px; */
