@@ -9,7 +9,7 @@
       </div>
       <div style="margin: 0.5rem;">
         <el-dropdown @command="changeLang">
-          <span style="cursor: pointer; font-size: medium;">
+          <span style="cursor: pointer; font-size: 1rem;">
           {{ $t('msg.languageName') }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -46,7 +46,7 @@ export default {
 }
 @media (min-width: 1301px) {
   html {
-    font-size: 20px;
+    font-size: 18px;
   }
 }
 @media (min-width: 501px) and (max-width: 1300px) {

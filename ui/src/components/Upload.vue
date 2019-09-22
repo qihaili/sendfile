@@ -3,7 +3,7 @@
     <div class="mycard2-upload">
       <div v-if="errorMsg">
         <el-row style="height: 450px; width: 100%; display: table; text-align: center;">
-          <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: large;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
+          <p style="display: table-cell; vertical-align: middle; color: #F56C6C; font-size: 1rem;"><i class="el-icon-warning" style="margin-right: 5px;"></i><span v-if="errorMsg.msg">{{ $t(errorMsg.msg) }}</span><span v-else>{{ errorMsg }}</span></p>
         </el-row>
         <el-row style="text-align: center; width: 100%;">
           <el-link type="primary" icon="el-icon-s-home" @click="backToHome">{{$t('msg.uploaded.backToHomeLink')}}</el-link>
