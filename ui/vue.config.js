@@ -2,7 +2,8 @@ module.exports = {
   publicPath: '/ui/',
   devServer: {
     // 设置主机地址
-    host: 'localhost',
+    // host: 'localhost',
+    host: '0.0.0.0',
     // 设置默认端口
     port: 8070,
     // 设置代理
