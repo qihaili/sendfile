@@ -17,7 +17,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -31,6 +33,21 @@ public class ShareController {
 
     @Autowired
     private HttpSession session;
+
+    @GetMapping
+    List<ShareWithToken> list() {
+        if (isAdmin()) {
+            List<ShareWithToken> shareWithTokens = new ArrayList<>();
+            for (ShareInfo shareInfo : shareService.getAllShares()) {
+                ShareWithToken shareWithToken = new ShareWithToken();
+                BeanUtils.copyProperties(shareInfo, shareWithToken);
+                shareWithTokens.add(shareWithToken);
+            }
+            return shareWithTokens;
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
 
     @PostMapping
     ShareWithToken upload(@RequestPart String ttl, @RequestPart(required = false) String password, @RequestPart("file") MultipartFile[] files) {
@@ -78,7 +95,7 @@ public class ShareController {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
             // 下载文件同样需要验证密码或Token
-            if (shareInfo.getPassword() == null || isShareOwner(shareId) || isShareViewer(shareId)) {
+            if (shareInfo.getPassword() == null || isShareOwner(shareId) || isShareViewer(shareId) || isAdmin()) {
                 File file = new File(new File(shareService.getShareDir(shareId), Util.FILES_DIR), filePath);
                 try {
                     InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
@@ -119,7 +136,7 @@ public class ShareController {
     void delete(@PathVariable String shareId, @RequestHeader String token) {
         ShareInfo shareInfo = shareService.getShare(shareId);
         if (shareInfo != null) {
-            if (isShareOwner(shareId)) {
+            if (isShareOwner(shareId) || isAdmin()) {
                 shareService.deleteShareDir(shareId);
             } else {
                 throw new UnauthorizedException();
@@ -202,6 +219,10 @@ public class ShareController {
             session.setAttribute("canReadShares", canReadShares);
         }
         return canReadShares;
+    }
+
+    private boolean isAdmin() {
+        return session.getAttribute("authenticated") != null;
     }
 
 }

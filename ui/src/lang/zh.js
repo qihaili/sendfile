@@ -1,5 +1,6 @@
 export const msg = {
   languageName: '中文',
+  logout: '退出',
   upload: {
     dragFile: {
       1: '将文件拖到此处，或',
@@ -56,5 +57,9 @@ export const msg = {
     confirmDelete: '确定删除文件共享？',
     okButton: '确定',
     cancelButton: '取消'
+  },
+  admin: {
+    authenticateButton: '验证',
+    inputPasswordPrompt: '请输入管理员密码'
   }
 }

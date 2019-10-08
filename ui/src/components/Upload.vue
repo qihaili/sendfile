@@ -279,15 +279,6 @@ export default {
 }
 </script>
 <style>
-.mycard {
-  /* max-width: 440px; */
-  min-height: 500px;
-  width: 500px;
-  /* height: 450px; */
-  margin: 10px;
-  display: inline-block;
-  vertical-align: top;
-}
 .list-enter, .list-leave-to {
   opacity: 0;
   transform: translateX(-30px);

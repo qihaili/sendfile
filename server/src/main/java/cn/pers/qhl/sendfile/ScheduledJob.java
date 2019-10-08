@@ -40,18 +40,7 @@ public class ScheduledJob implements SchedulingConfigurer {
         }
         scheduledTaskRegistrar.addFixedRateTask(() -> {
             logger.debug("检测过期的共享");
-
-            File repo = new File(Util.REPO_ROOT);
-            if (!repo.exists()) {
-                repo.mkdirs();
-            }
-            for (String lv1Id : repo.list()) {
-                File lv1Dir = new File(repo, lv1Id);
-                for (String lv2Id : lv1Dir.list()) {
-                    String shareId = lv1Id + lv2Id;
-                    shareService.getShare(shareId);
-                }
-            }
+            shareService.getAllShares();
 //        }, new Double(config.getShare().getScanInterval() * 60 * 60 * 1000).longValue());
         }, interval);
     }

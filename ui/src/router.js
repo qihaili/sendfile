@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Upload from './components/Upload'
 import Download from './components/Download'
+import Admin from './components/Admin'
 
 Vue.use(Router)
 
@@ -16,6 +17,10 @@ export default new Router({
       path: '/',
       // redirect: '/upload', // 默认页面
       component: Upload
+    },
+    {
+      path: '/admin',
+      component: Admin
     },
     {
       path: '/:shareId',

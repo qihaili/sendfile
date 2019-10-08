@@ -1,5 +1,6 @@
 export const msg = {
   languageName: 'English',
+  logout: 'Logout',
   upload: {
     dragFile: {
       1: 'Drag files here, or ',
@@ -56,5 +57,9 @@ export const msg = {
     confirmDelete: 'You are going to delete these files. Are you sure?',
     okButton: 'OK',
     cancelButton: 'Cancel'
+  },
+  admin: {
+    authenticateButton: 'Login',
+    inputPasswordPrompt: 'Please input admin password'
   }
 }

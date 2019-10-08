@@ -26,6 +26,11 @@ const i18n = new VueI18n({
 
 new Vue({
   router,
+  data() {
+    return {
+      adminLoggedIn: null
+    }
+  },
   render: h => h(App),
   i18n
 }).$mount('#app')

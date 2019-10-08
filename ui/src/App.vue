@@ -7,9 +7,9 @@
       <div>
         <i class="el-icon-s-promotion" style="margin-right: 1rem; font-size: 4rem; color: #409EFF; vertical-align: middle;"></i><span style="font-size: 2.5rem; font-weight: bold; color: #606266; vertical-align: middle;">Send File</span>
       </div>
-      <div style="margin: 0.5rem;">
-        <el-dropdown @command="changeLang">
-          <span style="cursor: pointer; font-size: 1rem;">
+      <div style="line-height: 40px; margin: 0.5rem;">
+        <el-dropdown @command="changeLang" class="header-element">
+          <span style="cursor: pointer;">
           {{ $t('msg.languageName') }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
@@ -17,6 +17,9 @@
             <!-- <el-dropdown-item command="en-US">English</el-dropdown-item> -->
           </el-dropdown-menu>
         </el-dropdown>
+        <el-button v-if="this.$root.adminLoggedIn" @click="logout" type="text" class="header-element">
+          {{ $t('msg.logout') }}
+        </el-button>
       </div>
     </el-row>
     <router-view/>
@@ -24,11 +27,18 @@
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   name: 'app',
   methods: {
     changeLang(command) {
       this.$i18n.locale = command
+    },
+    logout() {
+      axios.post('/api/logout')
+      .then(() => {
+        this.$root.adminLoggedIn = false
+      })
     }
   }
 }
@@ -43,6 +53,10 @@ export default {
   color: #2c3e50;
   margin-top: 1rem;
   min-width: 300px;
+}
+.header-element {
+  margin: 0px 20px;
+  font-size: 1rem;
 }
 @media (min-width: 1301px) {
   html {

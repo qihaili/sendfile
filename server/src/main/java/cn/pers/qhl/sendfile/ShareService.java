@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ShareService {
@@ -122,6 +123,25 @@ public class ShareService {
             this.id = id;
             this.dir = dir;
         }
+    }
+
+    public List<ShareInfo> getAllShares() {
+        List<ShareInfo> shares = new ArrayList<>();
+        File repo = new File(Util.REPO_ROOT);
+        if (!repo.exists()) {
+            repo.mkdirs();
+        }
+        for (String lv1Id : repo.list()) {
+            File lv1Dir = new File(repo, lv1Id);
+            for (String lv2Id : lv1Dir.list()) {
+                String shareId = lv1Id + lv2Id;
+                ShareInfo shareInfo = getShare(shareId);
+                if (shareInfo != null) {
+                    shares.add(shareInfo);
+                }
+            }
+        }
+        return shares;
     }
     
 }
